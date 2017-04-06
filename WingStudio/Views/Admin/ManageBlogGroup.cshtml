@@ -1,0 +1,135 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.BlogGroup>
+
+@{
+    ViewBag.Title = "管理博客组";
+}
+
+<section class="widget">
+    <header><span class="table-header"><i class="icon-folder-close"></i> 管 理 博 客 组</span></header>
+    <div class="container">
+        <span class="btn btn-primary pointer margin-bottom-10" onclick="location.href = '/Admin/AddBlogGroup'"><i class="icon-plus"></i> 添加博客组</span>
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>组名</th>
+                        <th>描述</th>
+                        <th>可见性</th>
+                        <th>创建时间</th>
+                        <th>修改</th>
+                        <th>删除</th>
+                        <th>添加成员</th>
+                        <th>查看成员</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                <tr>
+                                    <td>@i</td>
+                                    <td>
+                                        <img src="~/Content/Images/Shared/Icon/@item.Icon" class="group-icon pointer" title="修改图标" onmouseover="UpdateIcon(@item.Id, 'blogGroup',@i);" id="blogGroup_@i"/>
+                                        <span title="@item.Theme">@item.Theme</span>
+                                    </td>
+                                    <td title="@item.Description">@item.Description</td>
+                                    <td>
+                                        @switch((int)item.Accessible)
+                                        {
+                                            case 1:
+                                                <span class="green">内部</span>
+                                                break;
+                                            case 2:
+                                                <span class="green">外部</span>
+                                                break;
+                                            case 3:
+                                                <span class="green">全部</span>
+                                                break;
+                                            default:
+                                                <span class="green">全部不</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td title="@item.CreateTime">@item.CreateTime</td>
+                                    <td>
+                                        <a href="@Url.Action("ModBlogGroup","Admin", new { Id = item.Id})" class="table-btn">
+                                            <i class="icon-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="swal({ title: '确定吗?', text: '删除这个博客组之后是不能恢复的!', type: 'warning', showCancelButton: true, confirmButtonColor: '#DD6B55', confirmButtonText: '确定',cancelButtonText:'取消' ,closeOnConfirm: false }, function () { location.href = '/Admin/DelBlogGroup/@item.Id' });" class="table-btn pointer">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="AddMemberToggle(@item.Id)" class="table-btn pointer">
+                                            <i class="icon-plus"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("ShowGroupBlogs","Admin", new { Id = item.Id})" class="table-btn" title="@item.Blogs.Count 篇">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("ManageBlogGroup", "Admin", new { page }))
+    </div>
+</section>
+
+<div id="forcheng-alert" class="forcheng-alert" style="display:none">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">添加成员<button type="button" class="close" aria-label="Close" onclick="AddMemberToggle(0)"><span aria-hidden="true">&times;</span></button></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="all-check" id="all-check" onclick="SelectedAllBox()" value="0">
+                                        全选
+                                    </label>
+                                </div>
+                            </th>
+                            <th>编号</th>
+                            <th>博客标题</th>
+                            <th>用户名</th>
+                            <th>用户姓名</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-data"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer"><center><a onclick="AddMemberToGroup()" class="panel-btn">确定</a> <a onclick="AddMemberToggle(0)" class="panel-btn margin-left-20">取消</a></center></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/Admin/ManageBlogGroup/ManageBlogGroup.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/ManageBlogGroup/ManageBlogGroup.js"></script>
+}

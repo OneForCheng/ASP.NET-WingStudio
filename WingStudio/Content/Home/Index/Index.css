@@ -1,0 +1,267 @@
+﻿.body-content
+{
+    padding:0;
+    padding-top:20px;
+}
+
+.body-content .header 
+{
+    margin-bottom:20px;
+    padding:15px;
+    background-color:#2294ca;
+    background-image: linear-gradient(45deg, #2c5499, #3e97e6);
+    color: #fff;
+    text-align:center;
+}
+
+.body-content .header .title
+{
+    font-weight:600;
+    font-size: 6em;
+    font-family: Georgia, serif;
+}
+
+.body-content .header .tip
+{
+    font-family: Helvetica,Arial,"Hiragino Sans GB","Hiragino Sans GB W3","Microsoft YaHei UI","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+}
+
+.body-content .content .side-left
+{
+   padding-left:40px;
+   padding-right:40px;
+}
+
+.body-content .content .side-left .panel
+{
+    min-height:240px;
+}
+
+.body-content .content .side-left .panel .menu
+{
+    color: #ffffff;
+    height:32px;
+    padding:0 15px;
+    border-bottom: 1px solid #d7d7d7;
+    background-color:#2294ca;
+    border-top-left-radius:4px;
+    border-top-right-radius:4px;
+}
+
+.body-content .content .side-left .panel .menu .menu-title
+{
+    line-height: 32px;
+    font-size: 16px;
+    display: block;
+    float: left;
+}
+
+.body-content .content .side-left .panel .menu ul {
+    float: right;
+    height: 30px;
+    font-size: 13px;
+    color: #4d4d4d;
+    margin: 0;
+    line-height: 20px;
+    list-style: none;
+}
+
+.body-content .content .side-left .panel .menu li {
+    overflow: hidden;
+    display: block;
+    float: left;
+    border: none;
+    clear: none;
+}
+
+.body-content .content .side-left .panel .menu li>a {
+    text-align: center;
+    margin: 0;
+    padding: 5px 10px 6px 10px;
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+}
+
+.body-content .content .side-left .panel .menu li>a.tabactive {
+    border-left: 1px solid #d7d7d7;
+    border-right: 1px solid #d7d7d7;
+    color: #000000;
+    background-color: #ffffff;
+    font-weight: bold;
+    font-family: Georgia, serif;
+    position: relative;
+}
+/*面板中的列表信息*/
+.panel .list-info{
+	font-size:12px;
+}
+.panel .list-info ul
+{
+    padding-left:0;
+    list-style:none;
+}
+.panel .list-info ul>li{
+    height: 27.4px;
+    line-height: 27.4px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.panel .list-info ul>li:hover{
+    background-color:#f2f2f2;
+	border-left:2px solid #c52d2f;
+	padding-left:8px;
+}
+.panel .list-info ul li .date{
+	float:right;
+	color:#aaa;
+}
+.panel .list-info ul li a{
+	height: 25px;
+    float: left;
+    max-width: 80%;
+    text-decoration:none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    transition: all .2s;
+}
+
+.panel .list-info ul li a:hover
+{
+    color:#c52d2f;
+}
+
+/*面板中的旋转木马图片轮播*/
+.panel .blank-data
+{
+    margin-left:10px;
+    height: 27.4px;
+    line-height: 27.4px;
+    color: red;
+}
+
+.panel .owl-carousel .item
+{
+    margin:5px;
+    margin-bottom:0;
+    padding:5px;
+    border:1px solid #ddd;
+    border-radius: 4px;
+}
+
+.panel .owl-carousel .item:hover
+{
+    border-color:#39adb4;
+}
+
+.panel .owl-carousel .item a img
+{
+    width:100px;
+    height:100px;
+    margin:0 auto;
+    border-radius: 4px;
+}
+
+.panel .owl-carousel .item .caption
+{
+    padding: 0px;
+    height: 48px;
+    margin-top:5px;
+    overflow: hidden;
+}
+
+.panel .owl-carousel .item .caption a h2
+{
+    font-family: 'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+    font-size: 14px;
+    line-height: 24px;
+    color: #333;
+    max-height: 48px;
+    overflow: hidden;
+    margin: 0px;
+    text-align: center;
+}
+
+.body-content .content .side-right 
+{
+    padding-left:0;
+    padding-right:30px;
+    max-height:760px;
+    overflow-y:auto;
+}
+
+.body-content .content .side-right .panel .list-group
+{
+    max-height:122px;
+    overflow-y:auto;
+}
+
+.body-content .content .side-right .search-btn
+{
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.body-content .content .side-right .search-btn:hover,
+.body-content .content .side-right .search-btn:focus
+{
+    background-color: #bce8f1;
+    border-color: #2294ca;
+}
+
+/*修改ie上的轮播图高度问题*/
+
+.owl-carousel .owl-stage-outer
+{
+    max-height:170px;
+}
+
+@media (min-width: 768px) and (max-width: 991px)
+{
+     .body-content .header .title
+    {
+        font-weight:500;
+        font-size: 5em;
+    }
+
+    .body-content .content .side-left
+    {
+        padding-left:20px;
+        padding-right:20px;
+    }
+    .body-content .content .side-right
+     {
+        padding:0;
+     }
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .body-content .header .title
+    {
+        font-weight:400;
+        font-size: 3.6em;
+    }
+    .body-content .content .side-left .panel .menu li>a
+    {
+        padding-left:2px;
+        padding-right:2px;
+    }
+    .body-content .content .side-left
+    {
+        padding-left:20px;
+        padding-right:20px;
+    }
+    .body-content .content .side-right
+     {
+        padding-left:5px;
+        padding-right:5px;
+     }
+    .panel .list-info ul li a
+    {
+        max-width:60%;
+    }
+}

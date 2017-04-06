@@ -1,0 +1,99 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.User>
+
+@{
+    ViewBag.Title = "用户组成员";
+    int id = ViewBag.GroupId;
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-group"></i> 用 户 组 成 员</span>
+    </header>
+    <div class="container">
+       <div class="group-name"><strong>@ViewBag.GroupName</strong></div>
+        <span class="btn btn-primary pointer margin-bottom-10" onclick="AddMemberToggle(@id)"><i class="icon-plus"></i> 添加成员</span>
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>账号</th>
+                        <th>姓名</th>
+                        <th>移除</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                <tbody>
+                    @{
+                        int page = ViewBag.PageNumber;
+                        int i = (page - 1) * 10;
+                        foreach (var item in Model)
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.Account</td>
+                                <td>@item.Name</td>
+                                <td>
+                                    <a href="/SuperAdmin/DelUserFromGroup/@item.Id?groupId=@id" class="table-btn">
+                                        <i class="icon-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("ShowGroupUsers", "SuperAdmin", new { id,  page }))
+    </div>
+</section>
+
+
+<div id="forcheng-alert" class="forcheng-alert" style="display:none">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">添加成员<button type="button" class="close" aria-label="Close" onclick="AddMemberToggle(0)"><span aria-hidden="true">&times;</span></button></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="all-check" id="all-check" onclick="SelectedAllBox()" value="0">
+                                        全选
+                                    </label>
+                                </div>
+                            </th>
+                            <th>编号</th>
+                            <th>用户名</th>
+                            <th>姓名</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-data"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer"><center><a onclick="AddMemberToGroup()" class="panel-btn">确定</a> <a onclick="AddMemberToggle(0)" class="panel-btn margin-left-20">取消</a></center></div>
+    </div>
+</div>
+
+
+@section Styles{
+    <link href="~/Content/SuperAdmin/ShowGroupUsers/ShowGroupUsers.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/SuperAdmin/ShowGroupUsers/ShowGroupUsers.js"></script>
+}

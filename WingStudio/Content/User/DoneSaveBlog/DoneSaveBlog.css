@@ -1,0 +1,43 @@
+﻿.content-box
+{
+    padding-top:30px;
+}
+
+/*左侧信息*/
+
+.content-box .side-left .panel .panel-heading
+{
+    text-align:center;
+}
+.content-box .side-left .list-group 
+{
+    text-align:center;
+}
+
+.content-box .side-left .list-group .glyphicon
+{
+    color:#ccc;
+}
+/*右侧信息*/
+.content-box .side-right .table-responsive
+{
+    padding:10px;
+    border-top:0;
+}
+
+.content-box .side-right table
+{
+    font-size:12px;
+}
+
+.content-box .side-right table thead tr th
+{
+    color:green;
+}
+
+.content-box .side-right table thead .glyphicon
+{
+    font-size:25px;
+    vertical-align:middle;
+    margin-right:10px;
+}

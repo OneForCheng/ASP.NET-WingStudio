@@ -1,0 +1,59 @@
+﻿.reset-panel
+{
+   position:fixed;
+    top: 30%;
+    left: 35%;
+    width: 30%;
+    z-index:1000;
+    border:8px solid rgba(0,0,0,0.2);
+}
+
+.reset-panel .panel
+{
+    margin-bottom:0;
+    border-radius:0;
+}
+
+.reset-panel .panel .panel-heading button
+{
+    width: 20px;
+    height: 20px;
+    background-color:#464646;
+    color:#fff;
+    font-weight: 400;
+    font-size:16px;
+    border-radius:3px;
+}
+
+.reset-panel .panel .panel-body .error-msg
+{
+    color:red;
+    margin-bottom:5px;
+}
+
+.reset-panel .panel .panel-body .input-group
+{
+    margin-bottom:10px;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .reset-panel
+    {
+         margin-left: 25%;
+         width: 50%;
+    }
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .reset-panel
+    {
+        left: 10%;
+         width: 80%;
+    }
+}
+
+.body-footer
+{
+    display:none;
+}

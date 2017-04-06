@@ -1,0 +1,135 @@
+﻿@using WingStudio.Models;
+@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.WebFile>
+
+@{
+    ViewBag.Title = "文件组成员";
+    int id = ViewBag.GroupId;
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-group"></i> 博 客 组 成 员</span>
+    </header>
+    <div class="container">
+        <div class="group-name"><strong>@ViewBag.GroupName</strong></div>
+        <span class="btn btn-primary pointer margin-bottom-10" onclick="AddMemberToggle(@id)"><i class="icon-plus"></i> 添加成员</span>
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>所有人</th>
+                        <th>查看</th>
+                        <th>下载</th>
+                        <th>移除</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            var url = "";
+                            Dictionary<FileType, string> dic = new Dictionary<FileType, string> {
+                                {FileType.Picture,"图片"},
+                                {FileType.Video,"视频"},
+                                {FileType.Music,"音乐"},
+                                {FileType.Application,"应用"},
+                                {FileType.Document,"文档"},
+                                {FileType.Other,"其它"},
+                            };
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                if(item.Type == FileType.Video)
+                                {
+                                    url = "/Admin/PlayVideo/" + item.Id.ToString();
+                                }
+                                else if(item.Type == FileType.Document)
+                                {
+                                    url = "/Admin/LookDocument/" + item.Id.ToString();
+                                }
+                                else
+                                {
+                                    url = "/Admin/LoadFile/" + item.Id.ToString();
+                                }
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.Name</td>
+                                    <td class="green">@dic[item.Type]</td>
+                                    <td>@item.Owner.Account</td>
+                                    <td>
+                                        <a href="@url" class="table-btn">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/LoadFile/@item.Id" class="table-btn">
+                                            <i class="icon-download"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="DelFileFromGroup(@item.Id, @id)" class="table-btn pointer">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("ShowGroupFiles", "Admin", new { id, page }))
+    </div>
+</section>
+
+<div id="forcheng-alert" class="forcheng-alert" style="display:none">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">添加成员<button type="button" class="close" aria-label="Close" onclick="AddMemberToggle(0)"><span aria-hidden="true">&times;</span></button></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="all-check" id="all-check" onclick="SelectedAllBox()" value="0">
+                                        全选
+                                    </label>
+                                </div>
+                            </th>
+                            <th>编号</th>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>用户名</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-data"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer"><center><a onclick="AddMemberToGroup()" class="panel-btn">确定</a> <a onclick="AddMemberToggle(0)" class="panel-btn margin-left-20">取消</a></center></div>
+    </div>
+</div>
+
+
+@section Styles{
+    <link href="~/Content/Admin/ShowGroupFiles/ShowGroupFiles.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/ShowGroupFiles/ShowGroupFiles.js"></script>
+}

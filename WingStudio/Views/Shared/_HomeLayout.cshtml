@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/Images/Shared/wing.ico" rel="shortcut icon" />
+    <title>@ViewBag.Title - WingStudio</title>
+    <!--[if lt IE 9]><script>location.href = "/Sorry";</script><![endif]-->
+    <link href="~/Content/Shared/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Shared/sweetalert.css" rel="stylesheet" />
+    <link href="~/Content/Shared/common.css" rel="stylesheet" />
+    <link href="~/Content/Home/common.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand"><img src="~/Content/Images/Shared/WingStudio.png" /></a>
+            </div>
+            <div id="navbar_collapse" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("首页", "Index", "Home")</li>
+                    <li>@Html.ActionLink("关于我们", "About", "Home")</li>
+                    <li>@Html.ActionLink("联系我们", "Contact", "Home")</li>
+                                        @*<li class="dropdown">
+            <a class="dropdown-toggle pointer" data-toggle="dropdown">更多<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+
+                <li>@Html.ActionLink("公告", "Notices", "Home")</li>
+                <li>@Html.ActionLink("动态", "Dynamics", "Home")</li>
+                <li>@Html.ActionLink("资源分享区", "ResourceColumn", "Home")</li>
+                <li>@Html.ActionLink("知识分享区", "BlogColumn", "Home")</li>
+            </ul>
+        </li>*@
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    @if (Request.IsAuthenticated)
+                    {
+                        if (User.IsInRole("User"))
+                        {
+                            <li class="active">@Html.ActionLink("我的主页", "Index", "User")</li>
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            <li class="active">@Html.ActionLink("我的主页", "Dashboard", "Admin")</li>
+                        }
+                        else
+                        {
+                            <li class="active">@Html.ActionLink("我的主页", "ManageUser", "SuperAdmin")</li>
+                        }
+                    }
+                    else
+                    {
+                        <li><a onclick="ShowLoginBlock()" class="pointer">登录</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        @RenderBody()
+        <div class="body-footer">
+            <span>&copy; @DateTime.Now.Year - WingStudio</span>
+        </div>
+    </div>
+    <div id="login_panel" class="login-panel" style="display:none">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title"><strong id="panel_title">用户登录</strong><button type="button" class="close" aria-label="Close" onclick="$('#login_panel').hide()"><span aria-hidden="true">×</span></button></h2>
+            </div>
+            <div class="panel-body">
+                <div class="error-msg" id="login_error_msg"></div>
+                <form action="javascript:PostLoginForm();" onsubmit="return CheckLoginForm()" role="form" id="login_form">
+                    @Html.AntiForgeryToken()
+                    <input class="hidden" data-val="true" data-val-required="IsAdmin 字段是必需的。" id="IsAdmin" name="IsAdmin" type="text" value="">                
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="">账号 <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li><a onclick="UserLogin()" class="pointer">用户</a></li>
+                                <li><a onclick="AdminLogin()" class="pointer">管理员</a></li>
+                            </ul>
+                        </div>
+                        <input class="form-control" data-val="true" data-val-required="Account 字段是必需的。" id="Account" maxlength="20" name="Account" required="required" type="text" value="">
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">密码&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <input class="form-control" data-val="true" data-val-required="Password 字段是必需的。" id="Password" maxlength="20" name="Password" required="required" type="password" value="">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default" onclick="ShowForgotPwdBlock()">忘了?</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">问题&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <select class="form-control" name="SecQusetion" id="SecQusetion" onchange="if ($('#SecQusetion').val() > 0) { $('#answer_box').show(); } else { $('#answer_box').hide(); }">
+                            <option value="0" selected="selected">安全提问(未设置请忽略)</option>
+                            <option value="1">母亲的名字</option>
+                            <option value="2">爷爷的名字</option>
+                            <option value="3">父亲出生的城市</option>
+                            <option value="4">您其中一位老师的名字</option>
+                            <option value="5">您个人计算机的型号</option>
+                            <option value="6">您最喜欢的餐馆名称</option>
+                        </select>
+                    </div>
+                    <div class="input-group" id="answer_box" style="display:none;">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">答案&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <input class="form-control" id="secanswer_mask" maxlength="50" type="text" value="" autocomplete="off">
+                        <input class="hidden" id="SecAnswer" maxlength="50" name="SecAnswer" type="text" value="">
+                    </div>
+                    <button type="submit" class="btn btn-block btn-lg btn-info">登录</button>
+                </form>
+                <form action="javascript:PostForgotPwdForm();" onsubmit="return CheckForgotPwdForm()" role="form" id="forgot_pwd_form" style="display:none;">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">账号&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <input class="form-control"  id="fpwd_account" maxlength="20" name="account" required="required" type="text" value="">
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">姓名&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <input class="form-control" id="fpwd_name" maxlength="20" name="name" required="required" type="text" value="">
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <img id="forgot_pwd_valicode" class="fpwd-validcode" src="@Url.Action("GetValidateCode","Home", new { type = "forget" })" alt="验证码" title="点击刷新" onclick="RefreshValiCode('forgot_pwd_valicode', 'forget')"/>
+                        </div>
+                        <input class="form-control" id="fpwd_code" maxlength="5" name="code" placeholder="验证码" required="required" type="text" value="">
+                    </div>
+                    <button type="submit" class="btn btn-block btn-lg btn-info">申请重设</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <a id="toTop" onclick="IntervalBackTop()"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></a>
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/sweetalert-dev.js"></script>
+    <script src="~/Scripts/AntiXss/xss.min.js"></script>
+    <script src="~/Scripts/common.js"></script>
+    <script src="~/Content/Home/common.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

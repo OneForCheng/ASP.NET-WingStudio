@@ -1,0 +1,100 @@
+﻿.content-box
+{
+    padding-top:20px;
+}
+
+/*====左侧栏====*/
+
+
+
+/*博客专栏*/
+.content-box .side-left .solid-column .thumbnail
+{
+    border:0;
+}
+.content-box .side-left .solid-column .thumbnail img
+{
+    display: block;
+    border-radius: 6px;
+    margin-left:auto;
+    margin-right:auto;
+}
+.content-box .side-left .solid-column .thumbnail  .caption
+{
+    padding: 0px;
+    margin-top:5px;
+    overflow: hidden;
+}
+
+.content-box .side-left .solid-column .thumbnail  .caption a h2
+{
+    font-size: 14px;
+    line-height: 24px;
+    color: #39adb4;
+    max-height: 48px;
+    overflow: hidden;
+    margin: 0px;
+    text-align: center;
+}
+
+.content-box .side-left .row .thumbnail:hover
+{
+    border-color:#39adb4;
+}
+
+.content-box .side-left .row .thumbnail img
+{
+    display: block;
+    border-radius: 6px;
+    margin-left:auto;
+    margin-right:auto;
+    border: 1px solid #ddd;
+}
+
+.content-box .side-left .row .thumbnail img:hover
+{
+    border-color:#39adb4;
+}
+
+.content-box .side-left .row .thumbnail  .caption
+{
+    padding: 0px;
+    height: 48px;
+    margin-top:5px;
+    overflow: hidden;
+}
+
+.content-box .side-left .row .thumbnail  .caption a h2
+{
+    font-family: 'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+    font-size: 14px;
+    line-height: 24px;
+    color: #333;
+    max-height: 48px;
+    overflow: hidden;
+    margin: 0px;
+    text-align: center;
+}
+
+.content-box .side-left .row .thumbnail  .caption a h2 .badge
+{
+    vertical-align:middle;
+    color: #fff;
+    background-color: #bce8f1;
+}
+
+/*====右侧栏====*/
+
+/*搜索框*/
+.content-box .side-right .search-btn
+{
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.content-box .side-right .search-btn:hover,
+.content-box .side-right .search-btn:focus
+{
+    background-color: #bce8f1;
+    border-color: #2294ca;
+}

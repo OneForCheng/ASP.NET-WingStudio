@@ -1,0 +1,122 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Application>
+
+@{
+    ViewBag.Title = "管理报名";
+    bool isSearch = (ViewBag.IsSearch == true);
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-comment"></i> 管 理 报 名</span>
+        <form action="/Admin/SearchApplication" role="search" method="get">
+            <div class="search-form">
+                <span class="search-header" onclick="document.getElementById('btnsubmit').click()">
+                    <i class="icon-search"></i>
+                </span>
+                <input type="text" class="search-input" name="searchContent" placeholder="报名主题[部分]" autocomplete="on" value="" required="required"/>
+                <button id="btnsubmit" class="hidden" type="submit"></button>
+            </div>
+        </form>
+    </header>
+    <div class="container">
+        <span class="btn btn-primary pointer margin-bottom-10" onclick="location.href = '/Admin/AddApplication'"><i class="icon-plus"></i> 添加报名</span>
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>主题</th>
+                        <th>发布人</th>
+                        <th>类型</th>
+                        <th>开始/截止</th>
+                        <th>状态</th>
+                        <th>查看</th>
+                        <th>修改</th>
+                        <th>删除</th>
+                        <th>报名总人数</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                <tr>
+                                    <td>@i</td>
+                                    <td title="@item.Theme">@item.Theme</td>
+                                    <td>@item.Publisher.Name</td>
+                                    @if (item.IsFormal)
+                                    {
+                                        <td class="green">正式</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="green">非正式</td>
+                                    }
+                                    <td title="@item.StartTime.ToString() - @item.EndTime.ToString()">@item.StartTime.ToString() - @item.EndTime.ToString()</td>
+                                    @if (DateTime.Now < item.StartTime)
+                                    {
+                                        <td class="red">未开始</td>
+                                    }
+                                    else if (DateTime.Now > item.EndTime)
+                                    {
+                                        <td class="red">已截止</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="red">进行中</td>
+                                    }
+                                    <td>
+                                        <a href="@Url.Action("ShowApplication","Home", new { Id = item.Id})" class="table-btn">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/ModApplication/@item.Id" class="table-btn">
+                                            <i class="icon-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="swal({ title: '确定吗?', text: '删除这个报名之后是不能恢复的!', type: 'warning', showCancelButton: true, confirmButtonColor: '#DD6B55', confirmButtonText: '确定',cancelButtonText:'取消' ,closeOnConfirm: false }, function () { location.href = '/Admin/DelApplication/@item.Id' });" class="table-btn pointer">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+
+                                    <td>
+                                        <a href="/Admin/ShowParticipants/@item.Id" title="查看报名情况"><span class="badge">@item.Participants.Count</span></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @if (isSearch)
+        {
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("SearchApplication", "Admin", new { page, searchContent = (string)ViewBag.SearchContent }))
+        }
+        else
+        {
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("ManageApplication", "Admin", new { page }))
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/Admin/ManageApplication/ManageApplication.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/ManageApplication/ManageApplication.js"></script>
+}

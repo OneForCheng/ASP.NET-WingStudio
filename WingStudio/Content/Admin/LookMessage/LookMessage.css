@@ -1,0 +1,34 @@
+﻿.container .row .title{
+    text-align:center;
+    padding-bottom:10px;
+    margin-bottom:10px;
+    line-height: 45px;
+    font-size: 25px;
+    font-weight:600;
+    border-bottom:  3px solid #f2f2f2;
+}
+.container .row .main-infor .content
+{
+    min-height:200px;
+    border:  3px solid #f2f2f2;
+    border-radius: 4px;
+    overflow-y:auto;
+    padding:10px;
+}
+
+.container .row .other-infor{
+	height: auto;
+    line-height: 25px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 12px;
+    color: #a6a6a6;
+}
+.container .row .other-infor .owner{
+	float: right;
+}
+
+.container .row .main-infor
+{
+    margin-top:20px;
+}

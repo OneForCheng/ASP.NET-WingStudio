@@ -1,0 +1,70 @@
+﻿.content-box
+{
+    padding-top:30px;
+}
+
+/*左侧信息*/
+
+.content-box .side-left .panel .panel-heading
+{
+    text-align:center;
+}
+
+.content-box .side-left .list-group 
+{
+    text-align:center;
+}
+
+.content-box .side-left .list-group .glyphicon
+{
+    color:#ccc;
+}
+
+
+/*右侧信息*/
+.content-box .side-right .table-responsive
+{
+    padding:10px;
+    padding-top:30px;
+    border-top:0;
+}
+
+.content-box .side-right table
+{
+    font-size:12px;
+}
+
+.content-box .side-right table td
+{
+    vertical-align:middle;
+}
+
+.content-box .side-right table td .btn_wrapper input
+{
+    width:50px;
+    padding:5px;
+    font-size: 12px;
+    font-family: Arial;
+    color: #606060;
+    border: 1px solid #e3e3e3;
+    background: #fff;
+    margin-left:10px;
+    margin-top:5px;
+    margin-bottom:5px;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.content-box .side-right table td .btn_wrapper input:hover
+{
+    border-color:#5daced;
+}
+
+.content-box .side-right table tr .tip
+{
+    color:green;
+}

@@ -1,0 +1,115 @@
+﻿@using WingStudio.Models;
+@using System.Text.RegularExpressions;
+@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Blog>
+
+@{
+    string action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+    string title = ViewBag.Title;
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-9 col-lg-10">
+            @{
+                if (action == "blogs")
+                {
+                    if (ViewBag.PublicBlog == true)
+                    {
+                        <div class="sub-title">
+                            <img src="/WingStudio/Avatar/@ViewBag.Avatar" />
+                            @title.Split('-').First()
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="sub-title">@title.Split('-').First()</div>
+                }
+                if (Model.Count > 0)
+                {
+
+                    Dictionary<BlogType, string> dic = new Dictionary<BlogType, string> {
+                                {BlogType.Jotting,"随笔"},
+                                {BlogType.Article,"文章"},
+                                {BlogType.Diary,"日记"},
+                            };
+                    foreach (var item in Model)
+                    {
+                        var brief = Regex.Replace(HttpUtility.HtmlDecode(item.Content.Replace("&nbsp;", "")), "<[^>]*>", "");
+                        if (brief.Length > 150)
+                        {
+                            brief = brief.Substring(0, 150);
+                        }
+                        <hr />
+                        <div class="blog-info">
+                            <div class="title"><a href="@Url.Action("ShowBlog","Home", new { id = item.Id})">@item.Theme</a><span class="type"> [@dic[item.Type]]</span></div>
+                            <div class="brief">摘要: @brief <a href="@Url.Action("ShowBlog","Home", new { id = item.Id})">阅读全文</a></div>
+                            <div class="description">
+                                <p>
+                                    <span>Publish &copy; @item.PublicTime</span>
+                                    <span><a href="@Url.Action("Blogs","Home", new { id = item.Owner.Account})">@item.Owner.Account</a></span>
+                                    <span>阅读(@item.LookCount)</span>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    switch (action)
+                    {
+                        case "onedayblogs":
+                            @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "Home", new { page, year = ViewBag.Year, month = ViewBag.Month, day = ViewBag.Day }));
+                            break;
+                        case "blogs":
+                            @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "Home", new { page, id = ViewBag.Account }));
+                        break;
+                    case "searchtagblog":
+                            @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "Home", new { page, searchContent = ViewBag.SearchContent, id = ViewBag.UserId }));
+                        break;
+                    case "searchpublicblog":
+                            @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "Home", new { page, searchContent = ViewBag.SearchContent }));
+                        break;
+                    case "columnblogs":
+                            @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "Home", new { page, id = ViewBag.GroupId }));
+                        break;
+                    }
+                }
+                else
+                {
+                    <hr />
+                    <center><p class="red">无任何数据!</p></center>
+                }
+            }
+        </div>
+        <div class="side-right col-xs-12 col-xs-12 col-md-3 col-lg-2">
+            <hr />
+            <div class="panel">
+              @using (Html.BeginForm("SearchPublicBlog", "Home", FormMethod.Get, new { role = "form" }))
+              {
+                <div class="input-group">
+                    <input type="text" class="form-control" name="searchContent" placeholder="博客" required="required">
+                    <div class="input-group-btn">
+                        <button type="submit" class="btn btn-default search-btn">搜索</button>
+                    </div>
+                </div>
+              }
+            </div>
+            <div class="panel panel-success">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="@Url.Action("BlogColumn", "Home")"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> 博客专栏</a></li>
+                    <li class="list-group-item"><a href="javascript:history.go(-1);"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 返回</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/Home/Blogs/Blogs.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/Blogs/Blogs.js"></script>
+}

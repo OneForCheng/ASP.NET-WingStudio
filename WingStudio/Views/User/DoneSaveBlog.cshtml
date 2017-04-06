@@ -1,0 +1,133 @@
+﻿@using WingStudio.Models;
+@model WingStudio.Models.Blog
+
+@{
+    string typeText = "", typeStr = "";
+    if(Model.Type ==  BlogType.Jotting)
+    {
+        typeText = "随笔";
+        typeStr = "jotting";
+    }
+    else if(Model.Type == BlogType.Article)
+    {
+        typeText = "文章";
+        typeStr = "article";
+    }
+    else
+    {
+        typeText = "日记";
+        typeStr = "diary";
+    }
+    ViewBag.Title = typeText + "保存成功 - 博客后台";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-2 col-lg-2">
+            <div class="panel panel-success">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    @if (Model.Type == BlogType.Jotting)
+                    {
+                        <li class="list-group-item"><a href="/User/AddBlog?type=jotting"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加随笔</a></li>
+                        <li class="list-group-item"><a href="/User/PrivateBlogs?type=jotting"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> 草稿箱&nbsp;&nbsp;&nbsp;</a></li>
+                        <li class="list-group-item"><a href="/User/LoginUserBlogs?type=jotting"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 查看随笔</a></li>
+                    }
+                    else if (Model.Type == BlogType.Article)
+                    {
+                        <li class="list-group-item"><a href="/User/AddBlog?type=article"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加文章</a></li>
+                        <li class="list-group-item"><a href="/User/PrivateBlogs?type=article"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> 草稿箱&nbsp;&nbsp;&nbsp;</a></li>
+                        <li class="list-group-item"><a href="/User/LoginUserBlogs?type=article"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 查看文章</a></li>
+                    }
+                    else
+                    {
+                        <li class="list-group-item"><a href="/User/AddBlog?type=diary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加日记</a></li>
+                        <li class="list-group-item"><a href="/User/LoginUserBlogs?type=diary"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 查看日记</a></li>
+                    }
+                    @if (ViewBag.PublicBlog == true)
+                    {
+                        <li class="list-group-item"><a href="/Blogs/@ViewBag.Account"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> 外部博客</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-sm-12 col-md-10 col-lg-10">
+            <ul class="nav nav-tabs">
+                @if (Model.Type == BlogType.Jotting)
+                {
+                    <li role="presentation" class="active"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=article">文章</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                    <li role="presentation"><a href="/User/Favorites">收藏</a></li>
+                    <li role="presentation"><a href="/User/BlogConfig">设置</a></li>
+                }
+                else if (Model.Type == BlogType.Article)
+                {
+                    <li role="presentation"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                    <li role="presentation" class="active"><a href="/User/ManageBlog?type=article">文章</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                    <li role="presentation"><a href="/User/Favorites">收藏</a></li>
+                    <li role="presentation"><a href="/User/BlogConfig">设置</a></li>
+                }
+                else
+                {
+                    <li role="presentation"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=article">文章</a></li>
+                    <li role="presentation" class="active"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                    <li role="presentation"><a href="/User/Favorites">收藏</a></li>
+                    <li role="presentation"><a href="/User/BlogConfig">设置</a></li>
+                }
+            </ul>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            @if (Model.IsPublic)
+                            {
+                                <th><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> @("成功发布" + typeText)</th>
+                            }
+                            else
+                            {
+                                if (Model.Type == BlogType.Diary)
+                                {
+                                    <th><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> 成功保存日记</th>
+                                }
+                                else
+                                {
+                                    <th><span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> 成功存为草稿</th>
+                                }
+
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@(typeText + "标题"): <a href="/User/ShowBlog/@Model.Id">@Model.Theme</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="/User/ShowBlog/@Model.Id"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 立即查看</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="/User/ModBlog/@Model.Id"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 继续编辑</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="/User/ManageBlog?type=@typeStr"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @("管理后台"+typeText)</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="/User/PublicUserBlogs"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 查看发布博客</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+   <link href="~/Content/User/DoneSaveBlog/DoneSaveBlog.css" rel="stylesheet" />
+}
+
+@section Scripts{
+   <script src="~/Content/User/DoneSaveBlog/DoneSaveBlog.js"></script>
+}

@@ -1,0 +1,117 @@
+﻿@model tolistblog
+
+@{
+    Layout = null;
+    ViewBag.Title = $"随笔: {Model.Theme} - {Model.Owner.Account}";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/Images/Shared/wing.ico" rel="shortcut icon" />
+    <title>@ViewBag.Title - WingStudio</title>
+    <!--[if lt IE 9]><script>location.href = "/Sorry";</script><![endif]-->
+    <link href="~/Content/Shared/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Shared/sweetalert.css" rel="stylesheet" />
+    <link href="~/Content/Shared/common.css" rel="stylesheet" />
+    <link href="~/Content/Home/common.css" rel="stylesheet" />
+    @if (Model.BlogEditor == BlogEditor.Baidu)
+    {
+        <link href="~/Scripts/syntaxhighlighter_3.0.83/styles/shCore.css" rel="stylesheet" />
+        <link href="~/Scripts/syntaxhighlighter_3.0.83/styles/shThemeDefault.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link href="~/Scripts/editor.md/css/editormd.min.css" rel="stylesheet" />
+    }
+    <link href="~/Content/Shared/ShowBlog/ShowToListBlog.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="body-content">
+            <div class="content-box">
+                <div class="title">@Model.Theme</div>
+                @if (Model.BlogEditor == BlogEditor.Baidu)
+                {
+                    <div class="content" id="html_content" style="display:none;">@Model.Content</div>
+                }
+                else
+                {
+                    <div class="content" id="html_content">
+                        <textarea style="display:none;" name="editormd-markdown-doc">@Model.Content</textarea>
+                    </div>
+                }
+                @if (Model.Tag != "")
+                {
+                    var subStrs = Model.Tag.Split(',');
+                    var count = subStrs.Length;
+                    if (count > 0)
+                    {
+                        <div class="tags">
+                            标签:
+                            @for (int i = 0; i < count - 1; i++)
+                            {
+                                <span class="tag">@subStrs[i]</span><span>,</span>
+                            }
+                            <span class="tag">@subStrs[count - 1]</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <a id="toTop" onclick="IntervalBackTop()"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></a>
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/sweetalert-dev.js"></script>
+    <script src="~/Scripts/AntiXss/xss.min.js"></script>
+    <script src="~/Scripts/common.js"></script>
+    <script src="~/Content/Home/common.js"></script>
+    @if (Model.BlogEditor == BlogEditor.Baidu)
+    {
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shCore.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shAutoloader.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushAppleScript.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushAS3.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushBash.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushColdFusion.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushCpp.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushCss.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushCSharp.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushDelphi.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushDiff.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushErlang.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushGroovy.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushJava.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushJavaFX.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushJScript.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPerl.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPhp.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPlain.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPowerShell.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPython.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushRuby.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushSass.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushScala.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushSql.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushVb.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushXml.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shLegacy.js"></script>
+        <script src="~/Content/User/ShowBlog/ShowBlog_baidu.js"></script>
+    }
+    else
+    {
+        <script src="~/Scripts/editor.md/lib/marked.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/prettify.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/raphael.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/underscore.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/sequence-diagram.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/flowchart.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/jquery.flowchart.min.js"></script>
+        <script src="~/Scripts/editor.md/editormd.min.js"></script>
+        <script src="~/Content/User/ShowBlog/ShowBlog_md.js"></script>
+    }
+</body>
+</html>

@@ -1,0 +1,135 @@
+﻿@model WingStudio.Models.UserInfo
+@{
+    ViewBag.Title = "完善个人信息";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <ul class="nav nav-tabs">
+            <li role="presentation"><a href="/User/AccountSetting">账户设置</a></li>
+            <li role="presentation" class="active"><a href="/User/InfoSetting">个人信息</a></li>
+            <li role="presentation"><a href="/User/ContactSetting">联系方式</a></li>
+            <li role="presentation"><a id="upload_avatar" class="pointer">更新头像</a></li>
+        </ul>
+        <div class="update-info">
+            @using (Html.BeginForm("UpdateInfo", "User", FormMethod.Post, new { @role = "form", enctype = "multipart/form-data", onsubmit = "return Checkform()" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <td class="td_title">
+                                    信息可见性:
+                                </td>
+                                <td class="td_content">
+                                    @Html.CheckBoxFor(m => m.PublicInfo, new { @class = "checkfor" })
+                                </td>
+                                <td class="tip">其他成员能否看到个人信息</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="td_title">
+                                    座右铭:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.Sign, new { @class = "input-style", type = "text", maxlength = "50" })
+                                </td>
+                                <td class="tip">不超过50个字(默认显示在成员信息中)</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    家乡:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.NativeAddr, new { @class = "input-style", type = "text" })
+                                </td>
+                                <td class="tip"></td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    现居地址:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.CurrentAddr, new { @class = "input-style", type = "text" })
+                                </td>
+                                <td class="tip"></td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    出生日期:
+                                </td>
+                                <td class="td_content">
+                                    @if (Model.Birthday == null)
+                                    {
+                                        @Html.TextBoxFor(x => x.Birthday, new { @class = "datainp indate input-style", type = "text" })
+                                    }
+                                    else
+                                    {
+                                        var birth = (DateTime)Model.Birthday;
+                                        <input class="datainp indate input-style" data-val="true" data-val-date="字段 Birthday 必须是日期。" id="Birthday" name="Birthday" type="text" value="@birth.Year-@birth.Month-@birth.Day">
+                                    }
+                                </td>
+                                <td class="tip"></td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    班级:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.Class, new { @class = "input-style", type = "text", maxlength = "20" })
+                                </td>
+                                <td class="tip">
+                                    不超过20个字
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    爱好:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.Hobby, new { @class = "input-style", type = "text", maxlength = "50" })
+                                </td>
+                                <td class="tip">不超过50个字</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    个人简介:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextAreaFor(x => x.Introduction, new { @class = "textarea-style",  type = "text", maxlength = "100", rows = "3" })
+                                </td>
+                                <td class="tip">不超过100个字</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title"></td>
+                                <td class="td_content">
+                                    <div class="btn_wrapper">
+                                        <input type="submit" value="保存">
+                                        <input type="button" onclick="history.go(-1);" value="取消">
+                                    </div>
+                                </td>
+                                <td class="red" id="error_msg"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@section Styles{
+   <link href="~/Content/User/InfoSetting/InfoSetting.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Scripts/jedate/jedate.js"></script>
+    <script src="~/Scripts/AreaSelect/cityJson.js"></script>
+    <script src="~/Scripts/AreaSelect/citySet.js"></script>
+    <script src="~/Scripts/AreaSelect/Popt.js"></script>
+    <script src="~/Content/User/InfoSetting/InfoSetting.js"></script>
+}

@@ -1,0 +1,93 @@
+﻿@{
+    Layout = null;
+    var page = ViewBag.Page ?? "PageNoFund";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    @if (page == "PageNoFund")
+    {
+        <title>404 - 资源不存在</title>
+    }
+    else if (page == "Error")
+    {
+        <title>500 - 访问出错</title>
+    }
+    else if (page == "BrowserVersionLow")
+    {
+        <title>Sorry - 浏览器版本太低</title>
+    }
+    else if(page == "InvalidPermission")
+    {
+        <title>401 - 无权访问</title>
+    }
+    else
+    {
+        <title>404 - 资源不存在</title>
+    }
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link href="~/Content/Shared/Error/Error.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <center>
+                <a href="@Url.Action("Index","Home")">
+                    <img src="~/Content/Images/Shared/WingStudio.png" alt="WingStudio" />
+                </a>
+            </center>
+        </div>
+        <div class="content">
+            @if (page == "PageNoFund")
+            {
+                <p><b class="red">404.</b> 抱歉! 您访问的资源不存在!</p>
+                <p>请确认您输入的网址是否正确，如果问题持续存在，请发邮件至contact@wingstudio.org与我们联系。</p>
+            }
+            else if (page == "Error")
+            {
+                <p><b class="red">500.</b> 抱歉! 访问出错!</p>
+                <p>可能由于错误的操作或网站自身问题，如果问题持续存在，请发邮件至contact@wingstudio.org与我们联系。</p>
+            }
+            else if (page == "BrowserVersionLow")
+            {
+                <p><b class="red">Sorry.</b> 浏览器版本太低!无法访问此网站。</p>
+                <p>该网站至少需要浏览器的<b class="red">内核≥IE9</b>的支持，请更换浏览器或升级浏览器!如果想了解详情，请发邮件至contact@wingstudio.org与我们联系。</p>
+            }
+            else if (page == "InvalidPermission")
+            {
+                <p><b class="red">401.</b> 非法操作，无权访问!</p>
+                <p>如果想了解详情，请发邮件至contact@wingstudio.org与我们联系。</p>
+            }
+            else
+            {
+                <p><b class="red">404.</b> 抱歉! 您访问的资源不存在!</p>
+                <p>请确认您输入的网址是否正确，如果问题持续存在，请发邮件至contact@wingstudio.org与我们联系。</p>
+            }
+            @if (Request.IsAuthenticated)
+            {
+                if (User.IsInRole("User"))
+                {
+                    <p class="text-right"><a href="/User">返回主页</a> 或者 <a href="javascript:history.go(-1);">返回上页</a></p>
+                }
+                else if(User.IsInRole("Admin"))
+                {
+                    <p class="text-right"><a href="/Admin">返回主页</a> 或者 <a href="javascript:history.go(-1);">返回上页</a></p>
+                }
+                else
+                {
+                    <p class="text-right"><a href="/SuperAdmin">返回主页</a> 或者 <a href="javascript:history.go(-1);">返回上页</a></p>
+                }
+            }
+            else
+            {
+                <p class="text-right"><a href="@Url.Action("Index","Home")">返回首页</a> 或者 <a href="javascript:history.go(-1);">返回上页</a></p>
+            }
+        </div>
+    </div>
+    <script src="~/Content/Shared/Error/Error.js"></script>
+</body>
+</html>
+
+

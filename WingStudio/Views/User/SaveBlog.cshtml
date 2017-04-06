@@ -1,0 +1,199 @@
+﻿@using WingStudio.Models;
+@model Blog
+@{
+    bool isModified = (ViewBag.IsModified == true);
+    string action = "AddBlog";
+    BlogType blogType = ViewBag.BlogType;
+    BlogEditor blogEditor = ViewBag.BlogEditor;
+    if (isModified)
+    {
+        action = "ModBlog";
+        if (blogType == BlogType.Jotting)
+        {
+            ViewBag.Title = "修改随笔";
+        }
+        else if (blogType == BlogType.Article)
+        {
+            ViewBag.Title = "修改文章";
+        }
+        else
+        {
+            ViewBag.Title = "修改日记";
+        }
+
+    }
+    else
+    {
+        if (blogType == BlogType.Jotting)
+        {
+            ViewBag.Title = "添加随笔";
+        }
+        else if (blogType == BlogType.Article)
+        {
+            ViewBag.Title = "添加文章";
+        }
+        else
+        {
+            ViewBag.Title = "添加日记";
+        }
+    }
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-2 col-lg-2">
+            <div class="panel panel-success">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    @if (blogType == BlogType.Jotting)
+                    {
+                        <li class="list-group-item"><a href="/User/AddBlog?type=jotting"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加随笔</a></li>
+                        <li class="list-group-item"><a href="/User/PrivateBlogs?type=jotting"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> 草稿箱</a></li>
+                        <li class="list-group-item"><a href="/User/LoginUserBlogs?type=jotting"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 查看随笔</a></li>
+                    }
+                    else if (blogType == BlogType.Article)
+                    {
+                        <li class="list-group-item"><a href="/User/AddBlog?type=article"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加文章</a></li>
+                        <li class="list-group-item"><a href="/User/PrivateBlogs?type=article"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> 草稿箱</a></li>
+                        <li class="list-group-item"><a href="/User/LoginUserBlogs?type=article"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 查看文章</a></li>
+                    }
+                    else
+                    {
+                        <li class="list-group-item"><a href="/User/AddBlog?type=diary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加日记</a></li>
+                        <li class="list-group-item"><a href="/User/LoginUserBlogs?type=diary"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 查看日记</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-sm-12 col-md-10 col-lg-10">
+            <ul class="nav nav-tabs">
+                @if (blogType == BlogType.Jotting)
+                {
+                    <li role="presentation" class="active"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=article">文章</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                   
+                }
+                else if (blogType == BlogType.Article)
+                {
+                    <li role="presentation"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                    <li role="presentation" class="active"><a href="/User/ManageBlog?type=article">文章</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                   
+                }
+                else
+                {
+                    <li role="presentation"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                    <li role="presentation"><a href="/User/ManageBlog?type=article">文章</a></li>
+                    <li role="presentation" class="active"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                  
+                }
+                <li role="presentation"><a href="/User/Favorites">收藏</a></li>
+                <li role="presentation"><a href="/User/BlogConfig">设置</a></li>
+            </ul>
+            <div class="blog-info">
+                <div class="title">@ViewBag.Title</div>
+                @using (Html.BeginForm(action, "User", FormMethod.Post, new { @class = "form-group", @role = "form", onsubmit = "return Checkform()" , id = "SaveBlogForm"}))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.TextBoxFor(x => x.Type, new { @class = "hidden", value = (BlogType)blogType })
+                    <div class="col-lg-12">
+                        <label for="Theme">标题:<!--[if lt IE 10]><span class="red"> [最长40个字]</span><![endif]--></label>
+                        @Html.TextBoxFor(x => x.Theme, new { @class = "form-control", placeholder = "标题[最长40个字]", type = "text", maxlength = "40", required = "required" })
+                    </div>
+                    <div class="col-lg-12">
+                        @if (blogEditor == BlogEditor.Baidu)
+                        {
+                            <label for="Content">内容(<span class="green">百度富文本编辑器</span>):</label>
+                            @Html.EditorFor(x => x.Content)
+                        }
+                        else
+                        {
+                            <label for="Content">内容(<sapn class="green">Markdown编辑器</sapn>):</label>
+                            <div id="blog-editormd">
+                                @Html.EditorFor(x => x.Content, new { @class= "editormd-markdown-textarea" })
+                            </div>
+                        }
+                       
+                    </div>
+                    if (blogType != BlogType.Diary)
+                    {
+                        <div class="col-lg-12">
+                            <label for="Tag">Tag标签:<!--[if lt IE 10]><span class="red"> [多个关键字之间用“,”分隔，最多不超过10个]</span><![endif]--></label>
+                            @Html.TextBoxFor(x => x.Tag, new { @class = "tag-input", placeholder = "标签[多个关键字之间用“,”分隔，最多不超过10个]", type = "text" })
+                        </div>
+                    }
+                    if (isModified)
+                    {
+                        if (Model.IsPublic || blogType == BlogType.Diary)
+                        {
+                            <button type="submit" class="btn-primary">保存修改</button>
+                            <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(x => x.IsPublic, new { @class = "hidden" })
+                            <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(true); return true;">发布草稿</button>
+                            <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(false); return true;">保存草稿</button>
+                            if (blogType == BlogType.Jotting)
+                            {
+                                <button type="button" class="btn-danger" onclick="BlogToTopList(@Model.Id)">入榜</button>
+                            }
+                            <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
+
+                        }
+                    }
+                    else
+                    {
+                        if (blogType == BlogType.Diary)
+                        {
+                            <button type="submit" class="btn-primary">保存</button>
+                            <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(x => x.IsPublic, new { @class = "hidden" })
+                            <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(true); return true;">发布</button>
+                            <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(false); return true;">存为草稿</button>
+                            if (blogType == BlogType.Jotting)
+                            {
+                                <button type="button" class="btn-danger" onclick="BlogToTopList(0)">入榜</button>
+                            }
+                            <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+    @if (blogEditor == BlogEditor.Baidu)
+    {
+        <link href="~/Scripts/UEditor/themes/default/css/ueditor.css" rel="stylesheet" />
+        <link href="~/Content/User/SaveBlog/SaveBlog_baidu.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link href="~/Scripts/editor.md/css/editormd.min.css" rel="stylesheet" />
+        <link href="~/Content/User/SaveBlog/SaveBlog_md.css" rel="stylesheet" />
+    }
+    <link href="~/Content/User/SaveBlog/SaveBlog.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    @if (blogEditor == BlogEditor.Baidu)
+    {
+        <script src="~/Scripts/UEditor/ueditor.config.js"></script>
+        <script src="~/Scripts/UEditor/ueditor.all.js"></script>
+        <script src="~/Content/User/SaveBlog/SaveBlog_baidu.js"></script>
+    }
+    else
+    {
+        <script src="~/Scripts/editor.md/editormd.min.js"></script>
+        <script src="~/Content/User/SaveBlog/SaveBlog_md.js"></script>
+    }
+    <script src="~/Content/User/SaveBlog/SaveBlog.js"></script>
+}

@@ -1,0 +1,6 @@
+﻿.forcheng-alert .panel .panel-body table>tbody>tr>td
+{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

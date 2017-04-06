@@ -1,0 +1,8 @@
+﻿body {
+}
+table tbody td .badge
+{
+    background-color:#d6973d;
+    border-radius: 3px;
+    padding: 5px 15px;
+}

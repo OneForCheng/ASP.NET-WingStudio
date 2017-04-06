@@ -1,0 +1,4 @@
+﻿function Checkform()
+{
+    return true;
+}

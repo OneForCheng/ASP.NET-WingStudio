@@ -1,0 +1,62 @@
+﻿ol, ul ,li{
+    list-style: none;
+    padding: 0;
+    margin:0;
+}
+
+
+a{color:#122e67;text-decoration:none;transition: all 0.2s;}
+a:hover{text-decoration:none;color:#c52d2f;transition: all 0.4s;}
+
+.body-content{
+    padding:50px;
+}
+
+.body-content .main-info{
+    border:1px solid #ddd;
+	font-size:12px;
+    min-height:330px;
+}
+.body-content .main-info ul>li{
+    height: 27.4px;
+    line-height: 27.4px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.body-content .main-info ul>li:hover{
+    background-color:#f2f2f2;
+	border-left:2px solid #c52d2f;
+	padding-left:8px;
+}
+.body-content .main-info ul li .date{
+	float:right;
+	color:#aaa;
+}
+.body-content .main-info ul li a{
+	height: 25px;
+    float: left;
+    max-width: 80%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    transition: all .2s;
+}
+
+ul.pagination>li>a
+{
+    font-size:10px;
+    padding:2px 7px;
+}
+
+/*横向导航表头*/
+ul.nav-tabs
+{
+    background-color:#ddd;
+}
+
+ul.nav-tabs>li>a
+{
+    border-radius:0;
+    margin-right:0;
+}

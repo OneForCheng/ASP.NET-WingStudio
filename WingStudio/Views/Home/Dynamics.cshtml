@@ -1,0 +1,66 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Dynamic>
+
+@{
+    bool isFormal = (ViewBag.IsFormal == true);
+    if(isFormal)
+    {
+        ViewBag.Title = "发展历程";
+    }
+    else
+    {
+        ViewBag.Title = "活动风采";
+    }
+
+}
+
+<div class="body-content">
+    <ul class="nav nav-tabs">
+        @if (isFormal)
+        {
+            <li role="presentation">
+                <a href="@Url.Action("Dynamics", "Home",new { isFormal = false })">活动风采</a>
+            </li>
+            <li role="presentation" class="active">
+                <a>发展历程</a>
+            </li>
+        }
+        else
+        {
+            <li role="presentation" class="active">
+                <a>活动风采</a>
+            </li>
+            <li role="presentation">
+                <a href="@Url.Action("Dynamics", "Home",new { isFormal = true })">发展历程</a>
+            </li>
+        }
+    </ul>
+    <div class="main-info">
+        <ul>
+            @if (Model.Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <li onclick="location.href='@Url.Action("ShowDynamic", "Home",new { Id = item.Id })'" class="pointer">
+                        <a>@item.Theme</a>
+                        <span class="date">@item.CreateTime.ToShortDateString()</span>
+                    </li>
+                }
+            }
+            else
+            {
+                <li><center><a class="red">暂无任何信息!</a></center></li>
+            }
+        </ul>
+    </div>
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Dynamics", "Home", new { isFormal, page }))
+</div>
+
+@section Styles{
+    <link href="~/Content/Home/Dynamics/Dynamics.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/Dynamics/Dynamics.js"></script>
+}

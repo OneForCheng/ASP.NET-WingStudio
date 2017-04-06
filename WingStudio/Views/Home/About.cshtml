@@ -1,0 +1,163 @@
+﻿
+@{
+    string page = ViewBag.Page;
+    if (page == "About")
+    {
+        ViewBag.Title = "网站简介";
+    }
+    else if(page == "Contact")
+    {
+        ViewBag.Title = "联系方式";
+    }
+    else if(page == "Service")
+    {
+        ViewBag.Title = "关于服务";
+    }
+    else
+    {
+        ViewBag.Title = "工作室简介";
+    }
+
+}
+<div class="body-content">
+    <div class="content-box">
+        <div class="logo-box">
+            <div class="logo">
+                <a href="@Url.Action("Index","Home")">
+                    <img src="~/Content/Images/Shared/logo.png" />
+                </a>
+            </div>
+        </div>
+        <div class="nav-select">
+            <div class="btn-group">
+                <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @ViewBag.Title <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="@Url.Action("About","Home")">网站简介</a></li>
+                    <li><a href="@Url.Action("Contact","Home")">联系方式</a></li>
+                    <li><a href="@Url.Action("Service","Home")">关于服务</a></li>
+                    <li><a href="@Url.Action("Studio","Home")">关于工作室</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-info">
+            <div class="side-left">
+                <ul>
+                    @if (page == "About")
+                    {
+                        <li class="active"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span><a href="@Url.Action("About","Home")">网站简介</a></li>
+                        <li><a href="@Url.Action("Contact","Home")">联系方式</a></li>
+                        <li><a href="@Url.Action("Service","Home")">关于服务</a></li>
+                        <li><a href="@Url.Action("Studio","Home")">关于工作室</a></li>
+                    }
+                    else if (page == "Contact")
+                    {
+                        <li><a href="@Url.Action("About","Home")">网站简介</a></li>
+                        <li class="active"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span><a href="@Url.Action("Contact","Home")">联系方式</a></li>
+                        <li><a href="@Url.Action("Service","Home")">关于服务</a></li>
+                        <li><a href="@Url.Action("Studio","Home")">关于工作室</a></li>
+                    }
+                    else if (page == "Service")
+                    {
+                        <li><a href="@Url.Action("About","Home")">网站简介</a></li>
+                        <li><a href="@Url.Action("Contact","Home")">联系方式</a></li>
+                        <li class="active"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span><a href="@Url.Action("Service","Home")">关于服务</a></li>
+                        <li><a href="@Url.Action("Studio","Home")">关于工作室</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="@Url.Action("About","Home")">网站简介</a></li>
+                        <li><a href="@Url.Action("Contact","Home")">联系方式</a></li>
+                        <li><a href="@Url.Action("Service","Home")">关于服务</a></li>
+                        <li class="active"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span><a href="@Url.Action("Studio","Home")">关于工作室</a></li>
+                    }
+                </ul>
+            </div>
+            <div class="side-right">
+                @if (page == "About")
+            {
+                    <div class="title">
+                        <span class="glyphicon glyphicon-align-right title-deck margin-right-10" aria-hidden="true"></span>
+                        <span>网站简介</span>
+                        <span class="glyphicon glyphicon-align-left title-deck margin-left-10" aria-hidden="true"></span>
+                    </div>
+                    <div class="content">
+                        WingStudio的门户网站。<br/>
+                        旨在提供一个平台让大家了解WingStudio是一个怎样的工作室、能够做一些什么。<br/>
+                        同时也发布上传一些好的博客文章以及资源供大家学习参考。
+                    </div>
+                }
+                else if (page == "Contact")
+                {
+                    <div class="title">
+                        <span class="glyphicon glyphicon-align-right title-deck margin-right-10" aria-hidden="true"></span>
+                        <span>联系方式</span>
+                        <span class="glyphicon glyphicon-align-left title-deck margin-left-10" aria-hidden="true"></span>
+                    </div>
+                    <div class="content">
+                        地址：雅安川农10教B308
+                        <br />
+                        邮箱：<a href="mailto:contact@wingstudio.org">contact@wingstudio.org</a>
+                        <br/>
+                        <a target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=HH9zcmh9f2hca3Vye29oaXh1czJzbns" style="text-decoration:none;"><img src="http://rescdn.qqmail.com/zh_CN/htmledition/images/function/qm_open/ico_mailme_12.png" /></a>
+                    </div>
+                }
+                else if (page == "Service")
+                {
+                    <div class="title">
+                        <span class="glyphicon glyphicon-align-right title-deck margin-right-10" aria-hidden="true"></span>
+                        <span>关于服务</span>
+                        <span class="glyphicon glyphicon-align-left title-deck margin-left-10" aria-hidden="true"></span>
+                    </div>
+                    <div class="content">
+                        WingStudio具备自己的开发团队。<br/>
+                        能够对外提供网站开发、App开发、桌面应用程序开发、知识讲座等一系列服务。<br />
+                    </div>
+                }
+                else
+                {
+                    <div class="title">
+                        <span class="glyphicon glyphicon-align-right title-deck margin-right-10" aria-hidden="true"></span>
+                        <span>工作室简介</span>
+                        <span class="glyphicon glyphicon-align-left title-deck margin-left-10" aria-hidden="true"></span>
+                    </div>
+                    <div class="content">
+                        <p class="sub-title">概述——</p>
+                        川农信息工程学院WingStudio。 <br />
+                        该工作室是由老师支持指导、计算机专业学生组成并自主管理的创新创业工作室。<br />
+                        WingStudio的人员主要由计算机专业大二、大三学生组成，工作室成员是经过精心挑选，热爱软件编程并具备较高开发能力的学生。每个人都有各自的学习方向和技术特长。<br />
+                        <p class="sub-title">这里有什么——</p>
+                        这里有一个良好的学习环境，有一群志同道合的编程爱好者，有师兄、师姐的精心指导，还有各种丰富的活动，我们作为一个大家庭在这里学习、成长。<br />
+                        另外，也会不时的接一些学校或外面的项目来不断磨炼、提高。
+                        <p id="enrollmentLink"><a class="pointer skyblue" onclick="$('#enrollmentLink').hide(); $('#enrollment').show();">比较感兴趣，了解工作室招新>>></a></p>
+                        <div id="enrollment" style="display:none;">
+                            <p class="sub-title">招新——</p>
+                            工作室在每年新生开学季，会举行招新。主要针对的人群是热爱编程、并且具有较强编程能力的大二学生。（当然也不排除个别已经比较优秀的大一新生）<br />
+                            招新形式: 门户网在线报名 <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 面试 <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 编程实战 <br />
+                            (通过第一轮面试以及第二轮编程实战即可成为工作室的正式成员)
+                            <p class="sub-title">我们需要怎样的人——</p>
+                            具备较好的编程能力、对编程有浓厚的兴趣<br />
+                            承受压力和辛苦、能钻研，能深挖<br />
+                            优秀的学习意识和学习能力、具有团队精神和责任心<br />
+                            <p class="sub-title">你能在这里得到什么——</p>
+                            一个良好的工作和学习环境，师兄、师姐们的指导，编程能力的提高，基本的工程能力（做项目），
+                            一个团队。
+                        </div>
+                    </div>
+                }
+                <div class="clear-both"></div>
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+
+@section Styles{
+    <link href="~/Content/Home/About/About.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/About/About.js"></script>
+}

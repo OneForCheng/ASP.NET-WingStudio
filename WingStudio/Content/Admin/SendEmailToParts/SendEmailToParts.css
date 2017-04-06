@@ -1,0 +1,55 @@
+﻿section.widget
+{
+   height:800px;
+}
+.input-line
+{
+    width:100%;
+}
+
+.input-line .input-col-1
+{
+    margin-left:5%;
+    width:90%;
+}
+
+.input-line .input-col-1 textarea
+{
+    vertical-align:top;
+}
+
+.input-line .input-col-2
+{
+    margin-left:5%;
+    float:left;
+    width:40%;
+}
+.input-line .input-col-4
+{
+    margin-top:20px;
+    margin-left:5%;
+    float:left;
+    width:10%;
+}
+
+#edui1
+{
+    width:100% !important;
+}
+
+@media (max-width: 767px)
+{
+    .input-line .input-col-2, .input-line .input-col-4
+    {
+        width:90%;
+    }
+    section.widget
+    {
+        height:1000px;
+    }
+}
+
+#result-alert
+ {
+    z-index: 1001;
+}

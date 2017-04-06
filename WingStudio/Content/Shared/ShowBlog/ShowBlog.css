@@ -1,0 +1,115 @@
+﻿.content-box
+{
+    padding-top:20px;
+}
+
+/*====左侧栏====*/
+.content-box .side-left .title
+{
+    font-size:20px;
+    font-weight:bold;
+    font-family:'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+}
+
+.content-box .side-left .content
+{
+    margin-top:30px;
+    margin-bottom:20px;
+    min-height:200px;
+    padding-top:10px;
+    border-top:1px dashed #ddd;
+    overflow-x:auto;
+}
+
+.content-box .side-left .content img
+{
+    max-width:100%;
+}
+
+.content-box .side-left .tag
+{
+    font-size:14px;
+    color:#888;
+}
+
+.content-box .side-left .tag a
+{
+    color:#4c4f8b;
+    text-decoration:underline;
+    padding:0 2px;
+}
+
+.content-box .side-left .near-post
+{
+    margin-top:10px;
+}
+
+.content-box .side-left .footer-info
+{
+    margin-top:10px;
+    padding-top:5px;
+    border-top:1px solid #ddd;
+    text-align:right;
+}
+.content-box .side-left .footer-info p
+{
+    font-size:13px;
+    font-family:'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+    line-height:16px;
+    color:#777;
+}
+
+.content-box .side-left .footer-info p a
+{
+    color:#39adb4;
+}
+
+ @media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .content-box .side-left .footer-info
+    {
+        text-align:left;
+    }
+}
+
+ 
+ /*====右侧栏====*/
+
+ .content-box .side-right .input-group input
+{
+    font-size:10px;
+    border-color: #bce8f1;
+}
+
+.content-box .side-right .input-group .dropdown-toggle
+{
+    border-color: #bce8f1;
+}
+
+ .content-box .side-right .input-group .search-btn
+{
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.content-box .side-right .input-group .search-btn:hover,
+.content-box .side-right .input-group .search-btn:focus
+{
+    background-color: #bce8f1;
+    border-color: #2294ca;
+}
+
+.content-box .side-right .panel .panel-heading
+{
+    text-align:center;
+}
+
+.content-box .side-right .list-group 
+{
+    text-align:center;
+}
+
+.content-box .side-right .list-group .glyphicon
+{
+    color:#ccc;
+}

@@ -1,0 +1,48 @@
+﻿body
+{
+    padding:0;
+}
+.content-box
+{
+    padding-top:10px;
+}
+
+/*====左侧栏====*/
+.content-box .title
+{
+    color:#337ab7;
+    font-size:20px;
+    font-weight:bold;
+    font-family:'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+}
+
+
+
+.content-box .content
+{
+    margin-top:10px;
+    min-height:200px;
+    padding-top:10px;
+    border-top:1px dashed #ddd;
+    overflow-x:auto;
+}
+
+.content-box .content img
+{
+    max-width:100%;
+}
+
+.content-box .tags
+{
+    padding-top:10px;
+    border-top:1px dashed #ddd;
+    font-size:14px;
+    color:#888;
+}
+
+.content-box .tags .tag
+{
+    color:#4c4f8b;
+    text-decoration:underline;
+    padding:0 2px;
+}

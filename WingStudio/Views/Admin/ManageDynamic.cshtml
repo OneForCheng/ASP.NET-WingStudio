@@ -1,0 +1,117 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Dynamic>
+
+@{
+    ViewBag.Title = "管理动态";
+    bool isSearch = (ViewBag.IsSearch == true);
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-star"></i> 管 理 动 态</span>
+        <form action="/Admin/SearchDynamic" role="search" method="get">
+            <div class="search-form">
+                <span class="search-header" onclick="document.getElementById('btnsubmit').click()">
+                    <i class="icon-search"></i>
+                </span>
+                <input type="text" class="search-input" name="searchContent" placeholder="动态主题[部分]" autocomplete="on" value="" required="required"/>
+                <button id="btnsubmit" class="hidden" type="submit"></button>
+            </div>
+        </form>
+    </header>
+    <div class="container">
+        <span class="btn btn-primary pointer margin-bottom-10" onclick="location.href = '/Admin/AddDynamic'"><i class="icon-plus"></i> 添加动态</span>
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>主题</th>
+                        <th>修订人</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>修改时间</th>
+                        <th>查看</th>
+                        <th>修改</th>
+                        <th>删除</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                <tr>
+                                    <td>@i</td>
+                                    <td>
+                                        <img src="~/Content/Images/Shared/Icon/@item.Icon" class="group-icon pointer" title="修改图标" onmouseover="UpdateIcon(@item.Id, 'dynamic',@i);" id="dynamic_@i" />
+                                        <span title="@item.Theme">@item.Theme</span>
+                                    </td>
+                                    <td>@item.Publisher.Name</td>
+                                    @if (item.IsFormal)
+                                    {
+                                        <td class="green">正式</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="green">非正式</td>
+                                    }
+                                    @if (item.IsPublic)
+                                    {
+                                        <td class="green">已发布</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="green">未发布</td>
+                                    }
+                                    <td title="@item.LastModTime">@item.LastModTime</td>
+                                    <td>
+                                        <a href="@Url.Action("ShowDynamic","Home", new { Id = item.Id})" class="table-btn">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/ModDynamic/@item.Id" class="table-btn">
+                                            <i class="icon-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="swal({ title: '确定吗?', text: '删除这个动态之后是不能恢复的!', type: 'warning', showCancelButton: true, confirmButtonColor: '#DD6B55', confirmButtonText: '确定',cancelButtonText:'取消' ,closeOnConfirm: false }, function () { location.href = '/Admin/DelDynamic/@item.Id' });" class="table-btn cursor">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @if (isSearch)
+        {
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("SearchDynamic", "Admin", new { page, searchContent = (string)ViewBag.SearchContent }))
+        }
+        else
+        {
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("ManageDynamic", "Admin", new { page }))
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/Admin/ManageDynamic/ManageDynamic.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/ManageDynamic/ManageDynamic.js"></script>
+}

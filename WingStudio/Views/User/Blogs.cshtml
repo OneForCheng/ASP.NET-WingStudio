@@ -1,0 +1,127 @@
+﻿@using WingStudio.Models;
+@using System.Text.RegularExpressions;
+@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Blog>
+@{
+    User logined = ViewBag.Logined;
+    string title = ViewBag.Title;
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-3 col-lg-2">
+            <div class="panel">
+                @using (Html.BeginForm("SearchLoginUserBlog", "User", FormMethod.Get, new { role = "form", id = "search_form" }))
+                {
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="searchContent" placeholder="我的博客" id="search_input"  required="required">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default search-btn">搜索</button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a onclick="SearchTarget('blog', '/User/SearchLoginUserBlog', '我的博客');" class="pointer">我的博客(默认)</a></li>
+                                <li><a onclick="SearchTarget('blogs', '/User/SearchPublicBlog', '所有博客');" class="pointer" >所有博客</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="/User/ManageBlog"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 博客管理</a></li>
+                    <li class="list-group-item"><a href="/User/PublicUserBlogs/@logined.Id"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 我的博客</a></li>
+                    <li class="list-group-item"><a href="/User/AddBlog?type=jotting"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加随笔</a></li>
+                    <li class="list-group-item"><a href="javascript:history.go(-1);"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 返回</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-xs-12 col-md-9 col-lg-10">
+            <div class="sub-title">@title.Split('-').First()</div>
+            @if (Model.Count > 0)
+            {
+                string action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+                Dictionary<BlogType, string> dic = new Dictionary<BlogType, string> {
+                                {BlogType.Jotting,"随笔"},
+                                {BlogType.Article,"文章"},
+                                {BlogType.Diary,"日记"},
+                            };
+                foreach (var item in Model)
+                {
+                    var brief = Regex.Replace(HttpUtility.HtmlDecode(item.Content.Replace("&nbsp;", "")), "<[^>]*>", "");
+                    if (brief.Length > 150)
+                    {
+                        brief = brief.Substring(0, 150);
+                    }
+                    <hr />
+                    <div class="blog-info">
+                        <div class="title"><a href="/User/ShowBlog/@item.Id">@item.Theme</a><span class="type"> [@dic[item.Type]]</span></div>
+                        <div class="brief">摘要: @brief <a href="/User/ShowBlog/@item.Id">阅读全文</a></div>
+                        <div class="description">
+                            @if (item.IsPublic)
+                            {
+                                <p>
+                                    <span>Publish &copy; @item.PublicTime</span>
+                                    <span><a href="/User/PublicUserBlogs/@item.Owner.Id">@item.Owner.Account</a></span>
+                                    <span>阅读(@item.LookCount)</span>
+                                    @if (item.Owner.Id == logined.Id)
+                                    {
+                                        <span><a href="/User/ModBlog/@item.Id">编辑</a></span>
+                                    }
+                                    <span>
+                                        <a href="/User/AddBlogToFavorites/@item.Id">收藏</a>
+                                        (@item.Favorites.Count)
+                                    </span>
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    <span>Modify &copy; @item.LastModTime</span>
+                                    <span><a href="/User/PublicUserBlogs/@item.Owner.Id">@item.Owner.Account</a></span>
+                                    <span>阅读(@item.LookCount)</span>
+                                    <span><a href="/User/ModBlog/@item.Id">编辑</a></span>
+                                </p>
+                            }
+                        </div>
+                    </div>
+                }
+                switch (action)
+                {
+                    case "onedayblogs":
+                        @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "User", new { page, year = ViewBag.Year, month = ViewBag.Month, day = ViewBag.Day }));
+                        break;
+                    case "publicuserblogs":
+                        @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "User", new { page , id = ViewBag.UserId }));
+                        break;
+                    case "searchpublicblog":
+                    case "searchtagblog":
+                    case "searchloginuserblog":
+                        @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "User", new { page, searchContent = ViewBag.SearchContent }));
+                        break;
+                    case "columnblogs":
+                        @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "User", new { page, id = ViewBag.GroupId }));
+                        break;
+                    case "loginuserblogs":
+                        @Html.PagedListPager((IPagedList)Model, page => Url.Action(action, "User", new { page, type = ViewBag.Type }));
+                        break;
+                }
+            }
+            else
+            {
+                <hr />
+                <center><p class="red">无任何数据!</p></center>
+            }
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+   <link href="~/Content/User/Blogs/Blogs.css" rel="stylesheet" />
+}
+
+@section Scripts{
+   <script src="~/Content/User/Blogs/Blogs.js"></script>
+}

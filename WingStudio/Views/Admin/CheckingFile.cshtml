@@ -1,0 +1,101 @@
+﻿@using WingStudio.Models;
+@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.WebFile>
+
+@{
+    ViewBag.Title = "审核文件";
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-file"></i> 审 核 文 件</span>
+    </header>
+    <div class="container">
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>所有人</th>
+                        <th>创建时间</th>
+                        <th>查看</th>
+                        <th>标记已审</th>
+                        <th>下载</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            var url = "";
+                            Dictionary<FileType, string> dic = new Dictionary<FileType, string> {
+                                {FileType.Picture,"图片"},
+                                {FileType.Video,"视频"},
+                                {FileType.Music,"音乐"},
+                                {FileType.Application,"应用"},
+                                {FileType.Document,"文档"},
+                                {FileType.Other,"其它"},
+                            };
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                if (item.Type == FileType.Video)
+                                {
+                                    url = "/Admin/PlayVideo/" + item.Id.ToString();
+                                }
+                                else if (item.Type == FileType.Document)
+                                {
+                                    url = "/Admin/LookDocument/" + item.Id.ToString();
+                                }
+                                else
+                                {
+                                    url = "/Admin/LoadFile/" + item.Id.ToString();
+                                }
+                                <tr>
+                                    <td>@i</td>
+                                    <td title="@item.Name">@item.Name</td>
+                                    <td class="green">@dic[item.Type]</td>
+                                    <td title="@item.Owner.Account（@item.Owner.Name）">@item.Owner.Account（@item.Owner.Name）</td>
+                                    <td title="@item.CreateTime">@item.CreateTime</td>
+                                    <td>
+                                        <a href="@url" class="table-btn">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/FilePassCheck/@item.Id" class="table-btn">
+                                            <i class="icon-ok"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/LoadFile/@item.Id" class="table-btn">
+                                            <i class="icon-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("CheckingFile", "Admin", new { page }))
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/Admin/CheckingFile/CheckingFile.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/CheckingFile/CheckingFile.js"></script>
+}

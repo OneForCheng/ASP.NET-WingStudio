@@ -1,0 +1,94 @@
+﻿ .content-box
+{
+    padding-top:50px;
+    margin:0 10%;
+}
+
+ .content-box .update-info
+{
+    font-size:12px;
+    width:80%;
+    margin:auto;
+}
+
+ .content-box .update-info a
+ {
+     text-decoration:none;
+     color:#5daced;
+ }
+
+ .content-box .update-info .data-line
+{
+    margin-top:30px;
+    width:100%;
+    
+}
+
+ .content-box .update-info .data-line .solid-line
+{
+    margin-top:10px;
+    margin-bottom:10px;
+    border:0;
+    background-color:#337ab7;
+    height:1px;
+}
+
+ .content-box .update-info .data-line .input-style
+{
+    margin-top:5px;
+    margin-bottom:5px;
+    width:160px;
+    height:20px;
+}
+
+ .content-box .update-info .data-line select
+{
+    margin-top:10px;
+    margin-bottom:5px;
+    width:160px;
+    height:20px;
+    font-size:12px;
+    padding:0;
+}
+
+ .content-box .update-info .data-line .txt-title
+{
+    width:70px;
+}
+
+ .content-box .update-info .data-line .btn_wrapper input
+{
+    resize: none;
+    width:50px;
+    padding:5px;
+    font-size: 12px;
+    font-family: Arial;
+    color: #606060;
+    border: 1px solid #e3e3e3;
+    background: #fff;
+    margin-top:5px;
+    margin-bottom:15px;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.content-box .update-info .data-line .btn_wrapper input:hover
+{
+    border-color:#5daced;
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .content-box
+    {
+         margin:0;
+    }
+    .content-box .update-info
+    {
+        width:100%;
+    }
+}

@@ -1,0 +1,46 @@
+﻿@model WingStudio.Models.Message
+@{
+    ViewBag.Title = "发送反馈";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <ul class="nav nav-tabs">
+            <li role="presentation"><a href="/User/ManageReceivedMsg">收信箱</a></li>
+            <li role="presentation" class="active"><a href="/User/SendMessage">发送反馈</a></li>
+            @if (ViewBag.ReadingMsgCount > 0)
+            {
+                <li role="presentation"><a href="/User/ReadingMsg">未读消息 <span class="tip-bubble" title="未读消息总数">@ViewBag.ReadingMsgCount</span></a></li>
+            }
+        </ul>
+        <div class="feedback-info">
+            <div class="title">反馈信息 <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></div>
+            @using (Html.BeginForm("SendMessage", "User", FormMethod.Post, new { @class = "form-group", @role = "form", onsubmit = "return Checkform()" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-lg-12">
+                    <label for="Theme" class="margin-bottom-10">主题:<!--[if lt IE 10]><span class="red"> [最长40个字]</span><![endif]--></label>
+                    @Html.TextBoxFor(x => x.Theme, new { @class = "form-control", placeholder = "消息主题[最长40个字]", type = "text", maxlength = "40", required = "required" })
+                </div>
+                <div class="col-lg-12">
+                    <label for="Content">内容:</label>
+                    @Html.EditorFor(x => x.Content)
+                </div>
+                <button type="submit" class="btn-primary">发送</button>
+                <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
+            }
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Scripts/UEditor/themes/default/css/ueditor.css" rel="stylesheet" />
+    <link href="~/Content/User/SaveMessage/SaveMessage.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Scripts/UEditor/ueditor.config.js"></script>
+    <script src="~/Scripts/UEditor/ueditor.all.js"></script>
+    <script src="~/Content/User/SaveMessage/SaveMessage.js"></script>
+}

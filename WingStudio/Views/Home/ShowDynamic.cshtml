@@ -1,0 +1,57 @@
+﻿@model Dynamic
+
+@{
+    if(Model.IsFormal)
+    {
+        ViewBag.Title = "发展历程详细";
+    }
+    else
+    {
+        ViewBag.Title = "活动风采详细";
+    }
+    Dynamic lastDynamic = ViewBag.LastDynamic;
+    Dynamic nextDynamic = ViewBag.NextDynamic;
+    var time = (Model.PublicTime == null) ? Model.LastModTime.ToString() : Model.PublicTime.ToString();
+}
+
+<div class="body-content">
+    <div class="row">
+        <div class="title">
+            <span class="title-deck margin-right-10"><span class="glyphicon glyphicon-star" aria-hidden="true"></span></span>
+            <span>@Model.Theme</span>
+            <span class="title-deck margin-left-10"><span class="glyphicon glyphicon-star" aria-hidden="true"></span></span>
+            <span class="return" onclick="history.go(-1);">返回</span>
+        </div>
+        <div class="other-info">
+            <span class="time">@time</span>
+            <span class="read-times">阅读量：@Model.LookCount 次</span>
+        </div>
+        <div class="main-info">
+            <div class="content" id="html_content" style="display:none;">@Model.Content</div>
+            <div class="near">
+                @if (lastDynamic != null)
+                {
+                    <div class="col-md-6">
+                        <a href="@Url.Action("ShowDynamic","Home", new { Id = lastDynamic.Id })">上一篇：@lastDynamic.Theme</a>
+                    </div>
+                }
+                @if (nextDynamic != null)
+                {
+                    <div class="col-md-6">
+                        <a href="@Url.Action("ShowDynamic","Home", new { Id = nextDynamic.Id })">下一篇：@nextDynamic.Theme</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/Home/ShowDynamic/ShowDynamic.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/ShowDynamic/ShowDynamic.js"></script>
+}
+
+

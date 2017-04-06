@@ -1,0 +1,94 @@
+﻿@model WingStudio.Models.UserInfo
+@{
+    ViewBag.Title = "完善联系方式";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <ul class="nav nav-tabs">
+            <li role="presentation"><a href="/User/AccountSetting">账户设置</a></li>
+            <li role="presentation"><a href="/User/InfoSetting">个人信息</a></li>
+            <li role="presentation" class="active"><a href="/User/ContactSetting">联系方式</a></li>
+            <li role="presentation"><a id="upload_avatar" class="pointer">更新头像</a></li>
+        </ul>
+        <div class="update-info">
+            @using (Html.BeginForm("UpdateContact", "User", FormMethod.Post, new { @role = "form", enctype = "multipart/form-data", onsubmit = "return Checkform()" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <td class="td_title">
+                                    信息可见性:
+                                </td>
+                                <td class="td_content">
+                                    @Html.CheckBoxFor(m => m.PublicContact, new { @class = "checkfor" })
+                                </td>
+                                <td class="tip">其他成员能否看到联系方式</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="td_title">
+                                    QQ账号:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.QQ, new { @class = "input-style", type = "text", minlength = "5", maxlength = "11" })
+                                </td>
+                                <td class="tip">5-11位数字</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    微信账号:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.WeiChat, new { @class = "input-style", type = "text", minlength = "5", maxlength = "19" })
+                                </td>
+                                <td class="tip">5-19位合法字符</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    博客主页:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.Blog, new { @class = "input-style", type = "text" })
+                                </td>
+                                <td class="tip">合法的url</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title">
+                                    手机号码:
+                                </td>
+                                <td class="td_content">
+                                    @Html.TextBoxFor(x => x.Phone, new { @class = "input-style", type = "text", minlength = "11", maxlength = "11" })
+                                </td>
+                                <td class="tip">11位数字</td>
+                            </tr>
+                            <tr>
+                                <td class="td_title"></td>
+                                <td class="td_content">
+                                    <div class="btn_wrapper">
+                                        <input type="submit" value="保存">
+                                        <input type="button" onclick="history.go(-1);" value="取消">
+                                    </div>
+                                </td>
+                                <td class="red" id="error_msg"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@section Styles{
+   <link href="~/Content/User/ContactSetting/ContactSetting.css" rel="stylesheet" />
+}
+
+@section Scripts{
+   <script src="~/Content/User/ContactSetting/ContactSetting.js"></script>
+}

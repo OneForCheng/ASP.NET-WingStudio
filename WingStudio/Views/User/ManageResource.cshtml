@@ -1,0 +1,69 @@
+﻿@model IQueryable<WebFolder>
+
+@{
+    ViewBag.Title = "个人资源";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-2 col-lg-2">
+            <div class="panel panel-success">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="#"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新建文件夹</a></li>
+                    <li class="list-group-item"><a href="#"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> 上传文件&nbsp;&nbsp;&nbsp;</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-sm-12 col-md-10 col-lg-10">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#">文档</a></li>
+                <li role="presentation"><a href="#">应用</a></li>
+                <li role="presentation"><a href="#">图片</a></li>
+                <li role="presentation"><a href="#">视频</a></li>
+                <li role="presentation"><a href="#">音频</a></li>
+                <li role="presentation"><a href="#">其它</a></li>
+            </ul>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="all-check" id="all-check" onclick="SelectedAllBox()" value="0">
+                                        文件名
+                                    </label>
+                                </div>
+                            </th>
+                            <th>大小</th>
+                            <th>修改日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count() > 0)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/User/ManageResource/ManageResource.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/User/ManageResource/ManageResource.js"></script>
+}

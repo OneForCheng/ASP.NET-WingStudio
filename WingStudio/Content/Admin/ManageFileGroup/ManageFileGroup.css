@@ -1,0 +1,10 @@
+﻿.container table td img
+{
+    width:30px;
+    height:30px;
+    vertical-align:middle;
+}
+.container table td
+{
+    vertical-align:middle;
+}

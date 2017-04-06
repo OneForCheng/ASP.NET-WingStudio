@@ -1,0 +1,157 @@
+﻿@using WingStudio.Models;
+@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Blog>
+
+@{
+    ViewBag.Title = "管理博客";
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-file-text"></i> 管 理 博 客</span>
+        <form action="/Admin/SearchBlog" role="search" method="get">
+            <div class="search-form">
+                <span class="search-header" onclick="document.getElementById('btnsubmit').click()">
+                    <i class="icon-search"></i>
+                </span>
+                <input type="text" class="search-input" name="searchContent" placeholder="博客标题[部分]" autocomplete="on" value="" required="required"/>
+                <button id="btnsubmit" class="hidden" type="submit"></button>
+            </div>
+        </form>
+    </header>
+    <div class="container">
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>标题</th>
+                        <th>类型</th>
+                        <th>发布人</th>
+                        <th>发布时间</th>
+                        <th>查看</th>
+                        <th>添加所属组</th>
+                        <th>移除所属组</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            Dictionary<BlogType, string> dic = new Dictionary<BlogType, string> {
+                                {BlogType.Jotting,"随笔"},
+                                {BlogType.Article,"文章"},
+                                {BlogType.Diary,"日记"},
+                            };
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                var publicTime = ((DateTime)item.PublicTime).ToString();
+                                <tr>
+                                    <td>@i</td>
+                                    <td title="@item.Theme">@item.Theme</td>
+                                    <td class="green">@dic[item.Type]</td>  
+                                    <td title="@item.Owner.Account（@item.Owner.Name）">@item.Owner.Account（@item.Owner.Name）</td>
+                                    <td title="@publicTime">@publicTime</td>
+                                    <td>
+                                        <a href="@Url.Action("ShowBlog","Admin", new { Id = item.Id})" class="table-btn">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="AddGroupToggle(@item.Id)" class="table-btn pointer">
+                                            <i class="icon-plus"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="DelGroupToggle(@item.Id)" class="table-btn pointer">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("ManageBlog", "Admin", new { page }))
+    </div>
+</section>
+
+<div id="add-alert" class="forcheng-alert" style="display:none">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">添加所属组<button type="button" class="close" aria-label="Close" onclick="AddGroupToggle(0)"><span aria-hidden="true">&times;</span></button></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="all-check" id="add-all-check" onclick="CheckedAllBox('#add-all-check', 'add-checkbox')" value="0">
+                                        全选
+                                    </label>
+                                </div>
+                            </th>
+                            <th>编号</th>
+                            <th>主题</th>
+                            <th>描述</th>
+                        </tr>
+                    </thead>
+                    <tbody id="add-body-data"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer"><center><a onclick="AddGroupToBlog()" class="panel-btn">确定</a> <a onclick="AddGroupToggle(0)" class="panel-btn margin-left-20">取消</a></center></div>
+    </div>
+</div>
+
+<div id="del-alert" class="forcheng-alert" style="display:none">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">移除所属组<button type="button" class="close" aria-label="Close" onclick="DelGroupToggle(0)"><span aria-hidden="true">&times;</span></button></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="all-check" id="del-all-check" onclick="CheckedAllBox('#del-all-check', 'del-checkbox')" value="0">
+                                        全选
+                                    </label>
+                                </div>
+                            </th>
+                            <th>编号</th>
+                            <th>主题</th>
+                            <th>描述</th>
+                        </tr>
+                    </thead>
+                    <tbody id="del-body-data"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer"><center><a onclick="DelBlogFromGroup()" class="panel-btn">确定</a> <a onclick="DelGroupToggle(0)" class="panel-btn margin-left-20">取消</a></center></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/Admin/ManageBlog/ManageBlog.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/ManageBlog/ManageBlog.js"></script>
+}

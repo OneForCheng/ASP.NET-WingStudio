@@ -1,0 +1,68 @@
+﻿.body-content
+{
+    padding:20px;
+}
+.body-content .row .title{
+    text-align:center;
+    padding-bottom:10px;
+    margin-bottom:10px;
+    line-height: 45px;
+    font-size: 25px;
+    font-weight:600;
+    border-bottom: 3px solid #f2f2f2;
+}
+.body-content .row .title .title-deck
+{
+    font-size:12px;
+    vertical-align:middle;
+    color:#aaa;
+}
+
+.body-content .row .title .return
+{
+    position:fixed;
+    right:10px;
+    top:50px;
+    cursor:pointer;
+    color:blue;
+    font-weight:100;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.body-content .row .main-info .content
+{
+    margin:0 2%;
+    min-height:380px;
+    border: 3px solid #f2f2f2;
+    border-radius: 5px;
+    overflow-x:auto;
+    padding:10px;
+}
+
+.body-content .row .other-info{
+	height: auto;
+    line-height: 25px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 12px;
+    color: #a6a6a6;
+}
+.body-content .row .other-info .read-times{
+	float: right;
+}
+
+.body-content .row .main-info
+{
+    margin-top:20px;
+}
+
+.body-content .row .main-info .near .col-md-6
+{
+    margin-top:10px;
+}
+
+.body-content .row .main-info .near a
+{
+    color:blue;
+}

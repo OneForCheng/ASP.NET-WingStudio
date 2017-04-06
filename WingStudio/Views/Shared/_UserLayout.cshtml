@@ -1,0 +1,89 @@
+﻿@using WingStudio.Models
+@{ 
+    var entity = new WebAppContext();
+    int id = Convert.ToInt32(User.Identity.Name);
+    var logined = entity.Users.Find(id);
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/Images/Shared/wing.ico" rel="shortcut icon" />
+    <title>@ViewBag.Title - WingStudio</title>
+    <!--[if lt IE 9]><script>location.href = "/Sorry";</script><![endif]-->
+    <link href="~/Content/Shared/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Shared/sweetalert.css" rel="stylesheet" />
+    <link href="~/Scripts/croppic/croppic.css" rel="stylesheet" />
+    <link href="~/Content/Shared/common.css" rel="stylesheet" />
+    <link href="~/Content/User/common.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <ul class="navbar-profile">
+                    <li class="dropdown">
+                        <a class="navbar-userinfo dropdown-toggle" data-toggle="dropdown" ondblclick="location.href='/User/Index'" title="双击跳转到个人主页">
+                            <img src="~/WingStudio/Avatar/@logined.Avatar" />
+                            <span class="account">@logined.Account</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("我的主页", "Index", "User")</li>
+                            <li>@Html.ActionLink("设置", "AccountSetting", "User")</li>
+                            <li>@Html.ActionLink("我的博客", "ManageBlog", "User")</li>
+                            <li>@Html.ActionLink("我的资源", "ManageResource", "User")</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div id="navbar_collapse" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("首页", "Index", "Home")</li>
+                    <li>@Html.ActionLink("博客专栏", "BlogColumn", "User")</li>
+                    <li>@Html.ActionLink("资源专栏", "ResourceColumn", "User")</li>
+                    @{
+                        int msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
+                        if (msgCount > 0)
+                        {
+                            <li>@Html.ActionLink("消息", "ReadingMsg", "User")<span class="tip-bubble-x" title="新消息">@msgCount</span></li>
+                        }
+                        else
+                        {
+                            <li>@Html.ActionLink("消息", "ManageReceivedMsg", "User")</li>
+                        }
+
+                    }
+                    
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>@Html.ActionLink("退出", "Logoff", "Home")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        @RenderBody()
+        <div class="body-footer">
+            <span>&copy; @DateTime.Now.Year - WingStudio</span>
+        </div>
+    </div>
+    <a id="toTop" onclick="IntervalBackTop()"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></a>
+    @*上传头像容器*@
+    <div id="avatar_box"></div>
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/sweetalert-dev.js"></script>
+    <script src="~/Scripts/croppic/croppic.js"></script>
+    <script src="~/Scripts/AntiXss/xss.min.js"></script>
+    <script src="~/Scripts/common.js"></script>
+    <script src="~/Content/User/common.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,127 @@
+﻿@model Application
+@{
+    ViewBag.Title = "报名";
+}
+
+<div class="body-content">
+    <div class="row">
+        <div class="title">
+            <span class="title-deck margin-right-10"><span class="glyphicon glyphicon-star" aria-hidden="true"></span></span>
+            <span>@Model.Theme</span>
+            <span class="title-deck margin-left-10"><span class="glyphicon glyphicon-star" aria-hidden="true"></span></span>
+            <span class="return" onclick="history.go(-1);">返回</span>
+        </div>
+        <div class="main-info">
+            <div class="content" id="html_content" style="display:none;">@Model.Content</div>
+        </div>
+        <div class="state-info">
+            <p class="tip">
+                <span class="tip-deck margin-right-10"><span class="glyphicon glyphicon-align-right" aria-hidden="true"></span></span>
+                <span>状态</span>
+                <span class="tip-deck margin-left-10"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span></span>
+            </p>
+            @if (ViewBag.AppState == 1)
+            {
+                <p class="blue">开始: @Model.StartTime.ToString()</p>
+                <p class="blue">截止: @Model.EndTime.ToString()</p>
+                <p>总计报名人数: <span class="badge">@Model.Participants.Count</span></p>
+                <span class="form-control alert-danger"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 报名已截止</span>
+            }
+            else if(ViewBag.AppState == 0)
+            {
+                <p class="blue">开始: @Model.StartTime.ToString()</p>
+                <p class="blue">截止: @Model.EndTime.ToString()</p>
+                <p>已报名人数: <span class="badge" id="apply_count">@Model.Participants.Count</span></p>
+                if (Model.IsFormal)
+                {
+                    <button type="button" class="form-control btn-primary" onclick="ApplyToggle(true)">我要报名</button>
+                }
+                else
+                {
+                    <button type="button" class="form-control btn-primary" onclick="ApplyToggle(false)">我要报名</button>
+                }
+            }
+            else
+            {
+                <p class="blue">开始: @Model.StartTime.ToString()</p>
+                <p class="blue">截止: @Model.EndTime.ToString()</p>
+                <span class="form-control alert-success"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> 报名未开始</span>
+            }
+
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+<div id="apply_panel" class="apply-panel" style="display:none">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title"><strong>申请报名</strong><button type="button" class="close" aria-label="Close" onclick="$('#apply_panel').hide()"><span aria-hidden="true">×</span></button></h2>
+        </div>
+        <div class="panel-body">
+            <div class="error-msg" id="apply_error_msg"></div>
+            <form action="javascript:PostApplyForm(@Model.Id);" onsubmit="return CheckApplyForm()" role="form">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">姓名&nbsp;&nbsp;&nbsp;</button>
+                    </div>
+                    <input class="form-control" id="apply_name" maxlength="20" name="Name" required="required" type="text" value="">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">学号&nbsp;&nbsp;&nbsp;</button>
+                    </div>
+                    <input class="form-control" id="apply_no" maxlength="9" name="StudentNo" required="required" type="text" value="">
+                </div>
+                @if (Model.IsFormal)
+                {
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">性别&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <select class="form-control" name="Sex" id="apply_sex">
+                            <option value="M" selected="selected">男</option>
+                            <option value="W">女</option>
+                        </select>
+                    </div>
+                }
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">班级&nbsp;&nbsp;&nbsp;</button>
+                    </div>
+                    <input class="form-control" id="apply_class" maxlength="30" name="StudentClass" required="required" type="text" value="">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">邮箱&nbsp;&nbsp;&nbsp;</button>
+                    </div>
+                    <input class="form-control" id="apply_email" name="Email" required="required" type="text" value="">
+                </div>
+                @if (Model.IsFormal)
+                {
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default cursor-default">电话&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                        <input class="form-control" id="apply_phone" maxlength="11" name="Phone" required="required" type="text" value="">
+                    </div>
+                }
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <img id="apply_valicode" class="apply-validcode" src="@Url.Action("GetValidateCode","Home", new { type = "apply" })" alt="验证码" title="点击刷新" onclick="RefreshValiCode('apply_valicode', 'apply')" />
+                    </div>
+                    <input class="form-control" id="apply_code" maxlength="5" name="code" placeholder="验证码" required="required" type="text" value="">
+                </div>
+                <button type="submit" class="btn btn-block btn-lg btn-info">提交申请</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/Home/ShowApplication/ShowApplication.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/ShowApplication/ShowApplication.js"></script>
+}

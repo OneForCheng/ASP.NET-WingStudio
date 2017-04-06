@@ -1,0 +1,114 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.User>
+
+@{
+    ViewBag.Title = "管理用户";
+    bool isSearch = (ViewBag.IsSearch == true);
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-user"></i> 管 理 用 户</span>
+        <form action="/SuperAdmin/SearchUser" role="search" method="post">
+            <div class="search-form">
+                <span class="search-header" onclick="document.getElementById('btnsubmit').click()">
+                    <i class="icon-search"></i>
+                </span>
+                <input type="text" class="search-input" name="searchContent" placeholder="用户名或姓名[部分]" autocomplete="on" value="" required="required"/>
+                <button id="btnsubmit" class="hidden" type="submit"></button>
+            </div>
+        </form>
+</header>
+    <div class="container">
+        <span class="btn btn-primary pointer margin-bottom-10" onclick="location.href = '/SuperAdmin/AddUser'"><i class="icon-plus"></i> 添加用户</span>
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>账号</th>
+                        <th>姓名</th>
+                        <th>创建时间</th>
+                        <th>更多信息</th>
+                        @*<th>删除</th>*@
+                        <th>禁用</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                <tbody>
+                    @{
+                        int page = ViewBag.PageNumber;
+                        int i = (page - 1) * 10;
+                        foreach (var item in Model)
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.Account</td>
+                                <td>@item.Name</td>
+                                <td>@item.CreateTime</td>
+                                <td><a onclick="ShowDetailInfo(@item.Id);" class="table-btn pointer">···</a></td>
+                                @*<td>
+                                    <a onclick="swal({ title: '确定吗?', text: '删除这个用户之后是不能恢复的!', type: 'warning', showCancelButton: true, confirmButtonColor: '#DD6B55', confirmButtonText: '确定',cancelButtonText:'取消' ,closeOnConfirm: false }, function () { location.href = '/SuperAdmin/DelUser/@item.Id' });" class="table-btn pointer">
+                                        <i class="icon-trash"></i>
+                                    </a>
+                                </td>*@
+                                <td>
+                                    <a href="/SuperAdmin/ForbiddenUser/@item.Id" class="table-btn">
+                                        @if (item.IsForbidden)
+                                        {
+                                            <i class="icon-ok"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="icon-remove"></i>
+                                        }
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @if (isSearch)
+        {
+             @Html.PagedListPager((IPagedList)Model, page => Url.Action("SearchUser", "SuperAdmin", new { page, searchContent = (string)ViewBag.SearchContent }))
+        }
+        else
+        {
+             @Html.PagedListPager((IPagedList)Model, page => Url.Action("ManageUser", "SuperAdmin", new { page }))
+        }
+    </div>
+</section>
+
+<div id="forcheng-alert" class="forcheng-alert" style="display:none">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span id="panel_title">标题</span><button type="button" class="close" aria-label="Close" onclick="$('#forcheng-alert').hide();"><span aria-hidden="true">&times;</span></button></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <tbody id="body-data"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer"><center><a onclick="$('#forcheng-alert').hide();" class="panel-btn">确定</a></center></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/SuperAdmin/ManageUser/ManageUser.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/SuperAdmin/ManageUser/ManageUser.js"></script>
+}

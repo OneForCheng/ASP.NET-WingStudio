@@ -1,0 +1,61 @@
+﻿@model WingStudio.Models.User
+@{
+    ViewBag.Title = "添加用户";
+}
+
+<section class="widget">
+    <header><span class="table-header"><i class="icon-user"></i> 添 加 用 户</span></header>
+    <div class="container">
+        @using (Html.BeginForm("AddUser", "SuperAdmin", FormMethod.Post, new { @class = "form-group", @role = "form", onsubmit = "return Checkform()" }))
+            {
+            <div class="input-line">
+                <div class="input-col-2">
+                    <label for="Account" class="margin-bottom-10">用户名:<!--[if lt IE 10]><span class="red"> [4-20个数字或字母]</span><![endif]--></label>
+                    @Html.TextBoxFor(x => x.Account, new { @class = "form-control", placeholder = "用户名[4-20个数字或字母]", type = "text", minlength = "4", maxlength = "20", required = "required" })
+                </div>
+                <div class="input-col-2">
+                    <label for="Name" class="margin-bottom-10">姓名:<!--[if lt IE 10]><span class="red"> [最长20个字]</span><![endif]--></label>
+                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder = "姓名[最长20个字]", type = "text", minlength = "1", maxlength = "20", required = "required" })
+                </div>
+            </div>
+            <div class="input-line">
+                <div class="input-col-2">
+                    <label for="Password" class="margin-bottom-10">密码:<!--[if lt IE 10]><span class="red"> [6-20个数字或字母]</span><![endif]--></label>
+                    @Html.TextBoxFor(x => x.Password, new { @class = "form-control", placeholder = "密码[6-20个字母或数字]", type = "password", minlength = "6", maxlength = "20", required = "required" })
+                </div>
+                <div class="input-col-2">
+                    <label for="Email" class="margin-bottom-10">邮箱:</label>
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder = "邮箱", type = "text", minlength = "4", maxlength = "100", required = "required" })
+                </div>
+            </div>
+            <div class="input-line">
+                <div class="input-col-2">
+                    <label for="Sex" class="margin-bottom-10">性别:</label>
+                    <select class="form-control" name="Sex">
+                        <option value="M" selected="selected">男</option>
+                        <option value="W">女</option>
+                    </select>
+                </div>
+                <div class="input-col-2">
+                    <label for="Grade" class="margin-bottom-10">年级:</label>
+                    <select class="form-control" name="Grade" id="Grade">
+                        <option value="年级" selected="selected">年级</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-line">
+                <button type="submit" class="form-control btn-primary input-col-4">提交</button>
+                <button class="form-control btn-primary input-col-4" onclick="history.go(-1);">取消</button>
+            </div>
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/SuperAdmin/SaveUser/SaveUser.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/SuperAdmin/SaveUser/SaveUser.js"></script>
+}
+

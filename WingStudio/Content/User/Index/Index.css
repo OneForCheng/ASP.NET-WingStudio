@@ -1,0 +1,247 @@
+﻿.content-box
+{
+    padding-top:20px;
+}
+
+/*当前登录用户信息*/
+.content-box .side-left .logined-info
+{
+    font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+
+.content-box .side-left .logined-info .avatar
+{
+   float:left;
+   margin-right:10px;
+   padding:5px;
+}
+
+.content-box .side-left .logined-info .avatar img
+{
+    border-radius:4px;
+    border:1px solid #d9edf7;
+    width:120px;
+    height:120px;
+}
+
+.content-box .side-left .logined-info .other-info
+{
+    padding:5px;
+}
+
+.content-box .side-left .logined-info .other-info .caption
+{
+    font-size:20px;
+    font-weight: 700;
+    line-height:35px;
+    color: #222;
+}
+
+.content-box .side-left .logined-info .other-info .sign
+{
+    line-height:25px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.content-box .side-left .logined-info .other-info .operation
+{
+    float:left;
+}
+
+.content-box .side-left .logined-info .other-info .operation>ul
+{
+    padding-left:0;
+}
+.content-box .side-left .logined-info .other-info .operation>ul>li
+{
+    font-size:13px;
+    line-height:25px;
+}
+
+.content-box .side-left .logined-info .glyphicon
+{
+    color:#ccc;
+}
+
+.content-box .side-left .logined-info .panel-footer
+{
+    background-color:#fff;
+    text-align:center;
+}
+.content-box .side-left .logined-info .panel-footer a
+{
+    margin:0 5px;
+}
+
+/*成员信息*/
+.content-box .side-left .user-infos .panel-body
+{
+    max-height:400px;
+    overflow-y:auto;
+}
+.content-box .side-left .user-infos .total
+{
+    color:#bbb;
+}
+
+.content-box .side-left .user-infos .thumbnail
+{
+    margin-bottom:10px;
+}
+
+.content-box .side-left .user-infos .user-info .avatar
+{
+    padding:5px;
+    float:left;
+}
+.content-box .side-left .user-infos .user-info .avatar img
+{
+    border-radius:4px;
+    border:1px solid #d9edf7;
+    width:90px;
+    height:90px;
+}
+
+.content-box .side-left .user-infos .user-info .caption
+{
+    float:left;
+    width:50%;
+}
+
+.content-box .side-left .user-infos .user-info .caption>p
+{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width:100px;
+}
+
+.content-box .side-left .user-infos .user-info .sign
+{
+    margin:0 5px;
+    clear:both;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.content-box .side-left .user-infos .user-info  .operation
+{
+    margin-top:5px;
+    border-top:1px solid #ddd;
+    padding:5px 10px;
+    padding-bottom:0;
+}
+
+.content-box .side-left .user-infos .user-info  .operation .item
+{
+    float:left;
+    margin:2px;
+    margin-right:0;
+    width:62px;
+    text-align:center;
+    color:#39adb4;
+    border:1px solid #ddd;
+    border-radius:2px;
+    padding:0 2px;
+}
+
+.content-box .side-left .user-infos .user-info  .operation .item:hover
+{
+    border-color: #2294ca;
+    cursor:pointer;
+}
+
+.content-box .side-left .user-infos .user-info  .operation .count
+{
+    color:#fff;
+    background-color:#ddd;
+    background-color: rgba(0,0,0,.8);
+}
+
+.content-box .side-left .user-infos .panel-footer
+{
+    background-color:#fff;
+    padding-bottom:5px;
+}
+
+.content-box .side-left .user-infos .panel-footer ul.pagination
+{
+    margin:0;
+}
+
+/*左侧栏*/
+.content-box .side-right .panel .list-group
+{
+    max-height:122px;
+    overflow-y:auto;
+}
+
+.content-box .side-right .search-btn
+{
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.content-box .side-right .search-btn:hover,
+.content-box .side-right .search-btn:focus
+{
+    background-color: #bce8f1;
+    border-color: #2294ca;
+}
+
+/*自定义一般性弹窗*/
+.forcheng-alert {
+    top: 30%;
+    left: 30%;
+    width: 40%;
+    position: fixed;
+    z-index: 1000;
+}
+
+.forcheng-alert .panel .panel-heading button
+{
+    width: 20px;
+    height: 20px;
+    background-color:#464646;
+    color:#fff;
+    font-weight: 400;
+    font-size:16px;
+    border-radius:3px;
+}
+
+.forcheng-alert .panel .panel-body {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+.forcheng-alert .panel .panel-body table .checkbox {
+            margin: 0;
+        }
+
+.forcheng-alert .panel .panel-footer .panel-btn {
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+.forcheng-alert .panel .panel-footer .panel-btn:hover {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #337ab7;
+            color: #fff;
+            padding: 5px 15px;
+            transition: all 0.3s ease;
+        }
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) {
+    .forcheng-alert {
+        left: 10%;
+        width: 80%;
+    }
+    .content-box .side-left .user-infos .user-info .caption
+    {
+        width:100%;
+    }
+}

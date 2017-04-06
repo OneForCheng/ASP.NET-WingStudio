@@ -1,0 +1,121 @@
+﻿@using WingStudio.Models;
+@{
+    WebAppContext entity = new WebAppContext();
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/Images/Shared/wing.ico" rel="shortcut icon" />
+    <title>@ViewBag.Title - WingStudio</title>
+    <!--[if lt IE 9]><script>location.href = "/Sorry";</script><![endif]-->
+    <link href="~/Content/Fonts/font-awesome-3.2.1/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/Shared/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Shared/sweetalert.css" rel="stylesheet" />
+    <link href="~/Scripts/croppic/croppic.css" rel="stylesheet" />
+    <link href="~/Content/Shared/common.css" rel="stylesheet" />
+    <link href="~/Content/Admin/common.css" rel="stylesheet" />
+
+    @RenderSection("Styles", required: false)
+    <!--[if lt IE 9]><script>location.href = "/Sorry";</script><![endif]-->
+    <!--[if lt IE 10]><link rel="stylesheet" href="/Content/Admin/ie9.css" media="all" /><![endif]-->
+</head>
+<body>
+    <div class="nav-header">
+        <header class="main">
+            <div class="content">
+                <span class="btn-menu" title="菜单栏"><i class="icon-list-ul"></i></span>
+                <strong>
+                    <a href="@Url.Action("Index","Home")" title="首页">
+                        <span class="white">WingStudio管理</span>
+                    </a>
+                </strong>
+                <span><a href="@Url.Action("Index","Home")" title="首页" class="home">首页</a></span>
+                <span class="btn-logoff pointer" onclick="location.href='@Url.Action("Logoff", "Home")'"><i class="icon-off"></i> 退出</span>
+            </div>
+        </header>
+    </div>
+    <nav>
+        <ul>
+            @if (isAdmin)
+            {
+                User logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageNotice) != 0) > 0)
+                {
+                    <li><a href="@Url.Action("ManageNotice", "Admin")" title="管理公告"><i class="icon-bullhorn"></i> 管理公告&nbsp;&nbsp;</a></li>
+                }
+                if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageDynamic) != 0) > 0)
+                {
+                    <li><a href="@Url.Action("ManageDynamic", "Admin")" title="管理动态"><i class="icon-star"></i> 管理动态&nbsp;&nbsp;</a></li>
+                }
+                if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageBlog) != 0) > 0)
+                {
+                    int blogCount = entity.Blogs.Count(m => !m.Checked && m.IsPublic);
+                    if (blogCount > 0)
+                    {
+                        <li><a href="@Url.Action("ManageBlog", "Admin")" title="管理博客"><i class="icon-file-text"></i> 管理博客&nbsp;&nbsp;</a><span class="tip-bubble-x" onclick="location.href='/Admin/CheckingBlog'" title="审查新博客">@blogCount</span></li>
+                    }
+                    else
+                    {
+                        <li><a href="@Url.Action("ManageBlog", "Admin")" title="管理博客"><i class="icon-file-text"></i> 管理博客&nbsp;&nbsp;</a></li>
+                    }
+                    <li><a href="@Url.Action("ManageBlogGroup", "Admin")" title="管理博客组"><i class="icon-folder-close"></i> 管理博客组</a></li>
+                }
+                if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageFile) != 0) > 0)
+                {
+                    int fileCount = entity.WebFiles.Count(m => !m.Checked);
+                    if (fileCount > 0)
+                    {
+                        <li><a href="@Url.Action("ManageFile", "Admin")" title="管理文件"><i class="icon-file"></i> 管理文件&nbsp;&nbsp;</a><span class="tip-bubble-x" onclick="location.href='/Admin/CheckingFile'" title="审查新文件">@fileCount</span></li>
+                    }
+                    else
+                    {
+                        <li><a href="@Url.Action("ManageFile", "Admin")" title="管理文件"><i class="icon-file"></i> 管理文件&nbsp;&nbsp;</a></li>
+                    }
+                    <li><a href="@Url.Action("ManageFileGroup", "Admin")" title="管理文件组"><i class="icon-folder-open"></i> 管理文件组</a></li>
+                }
+                if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageApplication) != 0) > 0)
+                {
+                    <li><a href="@Url.Action("ManageApplication", "Admin")" title="管理报名"><i class="icon-comment"></i> 管理报名&nbsp;&nbsp;</a></li>
+                }
+                if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageMessage) != 0) > 0)
+                {
+                    int msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == 0) > 0);
+                    if (msgCount > 0)
+                    {
+                        <li><a href="@Url.Action("ManageReceivedMsg", "Admin")" title="管理消息"><i class="icon-envelope"></i> 管理消息&nbsp;&nbsp;</a><span class="tip-bubble-x" onclick="location.href = '/Admin/ReadingMsg'" title="查看新消息">@msgCount</span></li>
+                    }
+                    else
+                    {
+                        <li><a href="@Url.Action("ManageReceivedMsg", "Admin")" title="管理消息"><i class="icon-envelope"></i> 管理消息&nbsp;&nbsp;</a></li>
+                    }
+                }
+            }
+            else
+            {
+
+                <li><a href="@Url.Action("ManageUser", "SuperAdmin")" title="管理用户"><i class="icon-user"></i> 管理用户&nbsp;&nbsp;</a></li>
+                <li><a href="@Url.Action("ManageUserGroup", "SuperAdmin")" title="管理用户组"><i class="icon-group"></i> 管理用户组</a></li>
+                <li><a href="@Url.Action("ChangeInfo", "SuperAdmin")" title="更新信息"><i class="icon-edit"></i> 更新信息&nbsp;&nbsp;</a></li>
+            }
+        </ul>
+    </nav>
+    <section class="content">
+        @RenderBody()
+    </section>
+    <a id="toTop" onclick="IntervalBackTop()"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></a>
+    @*上传图标容器*@
+    <div id="icon_box"></div>
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/scripts/sweetalert-dev.js"></script>
+    <script src="~/Scripts/croppic/croppic.js"></script>
+    <script src="~/Scripts/AntiXss/xss.min.js"></script>
+    <script src="~/Scripts/common.js"></script>
+    <script src="~/Content/Admin/common.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

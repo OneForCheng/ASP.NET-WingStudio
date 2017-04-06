@@ -1,0 +1,33 @@
+﻿.btn-primary{
+    margin-bottom:10px;
+	background: #208ed3;
+	border: 1px solid #208ed3;
+}
+.btn-primary:hover{
+	color: #fff;
+    background-color: #333;
+    border-color: #333;
+}
+
+.input-line
+{
+    clear:both;
+    width:100%;
+}
+
+.input-line .input-col-4
+{
+    float:left;
+    width:10%;
+    margin-left:15px;
+}
+
+@media (max-width: 767px)
+{
+    .input-line .input-col-4
+    {
+        width:100%;
+        margin-left:0;
+    }
+   
+}

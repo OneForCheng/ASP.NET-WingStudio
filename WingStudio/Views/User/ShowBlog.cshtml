@@ -1,0 +1,208 @@
+﻿@using WingStudio.Models;
+@model WingStudio.Models.Blog
+
+@{
+
+    Blog lastBlog = ViewBag.LastBlog;
+    Blog nextBlog = ViewBag.NextBlog;
+    User logined = ViewBag.Logined;
+    string typeText = "";
+    if (Model.Type == BlogType.Jotting)
+    {
+        typeText = "随笔: ";
+    }
+    else if (Model.Type == BlogType.Article)
+    {
+        typeText = "文章: ";
+    }
+    else
+    {
+        typeText = "日记: ";
+    }
+    ViewBag.Title = typeText + Model.Theme + " - " + Model.Owner.Account;
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-3 col-lg-2">
+            <div class="panel">
+                @using (Html.BeginForm("SearchLoginUserBlog", "User", FormMethod.Get, new { role = "form", id = "search_form" }))
+                {
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="searchContent" placeholder="我的博客" id="search_input" required="required">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default search-btn">搜索</button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a onclick="SearchTarget('blog','/User/SearchLoginUserBlog','我的博客');" class="pointer">我的博客(默认)</a></li>
+                                <li><a onclick="SearchTarget('blogs', '/User/SearchPublicBlog', '所有博客');" class="pointer">所有博客</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="/User/ManageBlog"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 博客管理</a></li>
+                    <li class="list-group-item"><a href="/User/PublicUserBlogs/@logined.Id"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 我的博客</a></li>
+                    <li class="list-group-item"><a href="/User/AddBlog?type=jotting"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加随笔</a></li>
+                    <li class="list-group-item"><a href="javascript:history.go(-1);"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 返回</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-xs-12 col-md-9 col-lg-10">
+            <div class="title"><a href="/User/ShowBlog/@Model.Id">@Model.Theme</a></div>
+            @if (Model.BlogEditor == BlogEditor.Baidu)
+            {
+                <div class="content" id="html_content" style="display:none;">@Model.Content</div>
+            }
+            else
+            {
+                <div class="content" id="html_content">
+                    <textarea style="display:none;" name="editormd-markdown-doc">@Model.Content</textarea>
+                </div>
+            }
+            
+            @if (Model.Tag != "")
+            {
+                var subStrs = Model.Tag.Split(',');
+                var count = subStrs.Length;
+                if (count > 0)
+                {
+                    <div class="tag">
+                        标签:
+                        @for (int i = 0; i < count - 1; i++)
+                        {
+                            <a href="@Url.Action("SearchTagBlog","User", new { searchContent = subStrs[i] })">@subStrs[i]</a>
+                            <span>,</span>
+                        }
+                        <a href="@Url.Action("SearchTagBlog","User", new { searchContent = subStrs[count - 1] })">@subStrs[count - 1]</a>
+                    </div>
+                }
+            }
+            @if (Model.IsPublic)
+            {
+                if (Model.Owner.Id == logined.Id)
+                {
+                    <div class="praise">
+                        <span class="own-praise-des">
+                            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 推荐(@Model.Recommendations.Count)
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="praise">
+                        <span class="praise-des" onclick="location.href = '/User/AddBlogToRecommendations/@Model.Id'">
+                            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 推荐(@Model.Recommendations.Count)
+                        </span>
+                    </div>
+                }
+
+            }
+            <div class="near-post">
+                @if (lastBlog != null)
+                {
+                    <div class="last-post">
+                        <a href="/User/ShowBlog/@lastBlog.Id"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 上一篇：@lastBlog.Theme</a>
+                    </div>
+                }
+                @if (nextBlog != null)
+                {
+                    <div class="next-post">
+                        <a href="/User/ShowBlog/@nextBlog.Id"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> 下一篇：@nextBlog.Theme</a>
+                    </div>
+                }
+            </div>
+            <div class="footer-info">
+                @if (Model.IsPublic)
+                {
+                    <p>
+                        <span>Publish &copy; @Model.PublicTime</span>
+                        <span><a href="/User/PublicUserBlogs/@Model.Owner.Id">@Model.Owner.Account</a></span>
+                        <span>阅读(@Model.LookCount)</span>
+                        @if (Model.Owner.Id == logined.Id)
+                        {
+                            <span><a href="/User/ModBlog/@Model.Id">编辑</a></span>
+                        }
+                        <span>
+                            <a href="/User/AddBlogToFavorites/@Model.Id">收藏</a>
+                            (@Model.Favorites.Count)
+                        </span>
+                    </p>
+                }
+                else
+                {
+                    <p>
+                        <span>Modify &copy; @Model.LastModTime</span>
+                        <span><a href="/User/PublicUserBlogs/@Model.Owner.Id">@Model.Owner.Account</a></span>
+                        <span>阅读(@Model.LookCount)</span>
+                        <span><a href="/User/ModBlog/@Model.Id">编辑</a></span>
+                    </p>
+                }
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+    @if (Model.BlogEditor == BlogEditor.Baidu)
+    {
+        <link href="~/Scripts/syntaxhighlighter_3.0.83/styles/shCore.css" rel="stylesheet" />
+        <link href="~/Scripts/syntaxhighlighter_3.0.83/styles/shThemeDefault.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link href="~/Scripts/editor.md/css/editormd.min.css" rel="stylesheet" />
+    }
+    <link href="~/Content/User/ShowBlog/ShowBlog.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    @if (Model.BlogEditor == BlogEditor.Baidu)
+    {
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shCore.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shAutoloader.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushAppleScript.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushAS3.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushBash.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushColdFusion.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushCpp.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushCss.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushCSharp.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushDelphi.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushDiff.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushErlang.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushGroovy.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushJava.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushJavaFX.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushJScript.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPerl.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPhp.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPlain.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPowerShell.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushPython.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushRuby.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushSass.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushScala.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushSql.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushVb.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shBrushXml.js"></script>
+        <script src="~/Scripts/syntaxhighlighter_3.0.83/scripts/shLegacy.js"></script>
+        <script src="~/Content/User/ShowBlog/ShowBlog_baidu.js"></script>
+    }
+    else
+    {
+        <script src="~/Scripts/editor.md/lib/marked.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/prettify.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/raphael.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/underscore.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/sequence-diagram.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/flowchart.min.js"></script>
+        <script src="~/Scripts/editor.md/lib/jquery.flowchart.min.js"></script>
+        <script src="~/Scripts/editor.md/editormd.min.js"></script>
+        <script src="~/Content/User/ShowBlog/ShowBlog_md.js"></script>
+    }
+}

@@ -1,0 +1,251 @@
+﻿/*整体布局*/
+body
+{
+    padding-top:50px;
+    background: #f5f5f5;
+}
+
+.body-content
+{
+    padding:10px;
+    min-height:550px;
+    background: #fff;
+}
+
+.body-footer
+{
+    border-top:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+    background: #fff;
+}
+
+a,a:hover,a:focus
+{
+    text-decoration:none;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+textarea
+{
+    resize:none;
+}
+
+/* 顶部导航 */
+.navbar-fixed-bottom, .navbar-fixed-top {
+    z-index: 1005;
+}
+
+.navbar-inverse {
+    background-color: #2294ca;
+    border-color: #3294ca;
+    font-family: 'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff
+}
+.navbar-inverse .navbar-nav>li>a:hover
+{
+    color:#ddd;
+}
+
+.navbar-inverse .navbar-toggle {
+    border-color: #ddd;
+}
+
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus
+{
+    background-color:#0e78e7;
+}
+
+.navbar-inverse .navbar-collapse,
+ .navbar-inverse .navbar-form {
+    border-color: #ddd;
+}
+
+/*个人信息导航*/
+.navbar .container .navbar-header .navbar-profile
+{
+    float:left;
+    margin-bottom:0;
+    padding:0;
+    position: relative;
+    min-width: 120px;
+}
+
+.navbar .container .navbar-header .navbar-profile .navbar-userinfo
+{
+    position: relative;
+    height: 50px;
+    line-height: 50px;
+    text-indent: 50px;
+    color: #fff;
+    vertical-align:middle;
+    text-decoration: none;
+    border-top: 0;
+    box-shadow: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.navbar .container .navbar-header .navbar-profile a
+{
+    display:block;
+    width: 120px;
+    text-shadow: 0 1px 1px #ddd;
+    text-shadow: 0 1px 1px rgba(0,0,0,.2);
+    background-color:#3e97e6;
+}
+
+.navbar .container .navbar-header .navbar-profile img
+{
+    margin-left:-45px;
+    border-radius:3px;
+    border: 1px solid #ddd;
+    border: 1px solid rgba(0,0,0,.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,.1);
+    width:30px;
+    height:30px;
+}
+
+.navbar .container .navbar-header .navbar-profile .account
+{
+    font-weight:600;
+    font-size:16px;
+}
+
+.navbar-profile .dropdown-menu {
+	min-width: 120px;
+    background-color: transparent;
+	-webkit-box-shadow: 0 3px 8px rgba(0,0,0,0.125);
+	-moz-box-shadow: 0 3px 8px rgba(0,0,0,0.125);
+	box-shadow: 0 3px 8px rgba(0,0,0,0.125);
+	border: 0;
+	padding: 0;
+	margin-top: 0;
+	border-top: 0;
+	border-radius: 0;
+	left: 0;
+}
+
+.navbar-profile .dropdown-menu:before {
+	position: absolute;
+	top: 0;
+}
+
+.navbar-profile .dropdown-menu>li>a {
+	padding: 8px 15px;
+	color: #fff;
+    border-top: 1px solid #0d5aa5;
+    box-shadow: 0 1px 1px rgba(0,0,0,.4);
+}
+
+.navbar-profile .dropdown-menu>li:hover>a,.navbar-profile .dropdown-menu>li:focus>a,.navbar-profile .dropdown-menu>li.active>a {
+	background-color: #2294ca !important;
+	color: #fff;
+}
+
+.navbar-profile .dropdown-menu>li:last-child>a {
+	border-radius: 0 0 3px 3px;
+}
+
+.navbar-profile .dropdown-menu>li.divider {
+	background-color: transparent;
+}
+
+.navbar-profile .dropdown:hover .dropdown-menu 
+{
+		display: block;
+		-webkit-animation: fadeInUp 400ms;
+		animation: fadeInUp 400ms;
+}
+
+/*消息气泡*/
+ul li .tip-bubble
+{
+    background: #bf1031;
+    border: 1px solid #b11331;
+    box-shadow: 0 1px 2px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.15);
+    color: #fff;
+    display: inline-block;
+    font-size: 12px;
+    padding: 0 4px;
+    height: 16px;
+    line-height: 16px;
+    border-radius: 50%;
+    text-indent: 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+ul li .tip-bubble-x
+{
+    position:absolute;
+    z-index:1;
+    cursor:default;
+    margin-top:-42px;
+    margin-left:35px;
+    background: #bf1031;
+    border: 1px solid #b11331;
+    box-shadow: 0 1px 2px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.15);
+    color: #fff;
+    display: inline-block;
+    font-size: 12px;
+    padding: 0 4px;
+    height: 16px;
+    line-height: 16px;
+    border-radius: 50%;
+    text-indent: 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+/*分页按钮*/
+ul.pagination>li>a
+{
+    font-size:10px;
+    padding:2px 7px;
+}
+
+/*横向导航表头*/
+ul.nav-tabs
+{
+    background-color:#ddd;
+}
+
+ul.nav-tabs>li>a
+{
+    border-radius:0;
+    margin-right:0;
+}
+
+/*更新头像容器*/
+#avatar_box {
+    display:none;
+    width: 200px;
+    height: 200px;
+    position:relative;
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    body>div.container
+    {
+        padding:0;
+    }
+   .navbar .container .navbar-header .navbar-profile
+    {
+        margin-left:15px;
+    }
+   ul li .tip-bubble-x
+   {
+       margin-top:-38px;
+   }
+}
+

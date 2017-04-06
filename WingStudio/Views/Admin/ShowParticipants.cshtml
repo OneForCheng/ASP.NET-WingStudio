@@ -1,0 +1,123 @@
+﻿@model IPagedList<Participant>
+
+@{
+    bool isFormal = (ViewBag.IsFormal == true);
+    bool isSearch = (ViewBag.IsSearch == true);
+    int groupId = ViewBag.GroupId;
+    ViewBag.Title = "报名情况";
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-signal"></i> 报 名 情 况</span>
+        <form action="/Admin/SearchParticipant/@groupId" role="search" method="get">
+            <div class="search-form">
+                <span class="search-header" onclick="document.getElementById('btnsubmit').click()">
+                    <i class="icon-search"></i>
+                </span>
+                <input type="text" class="search-input" name="searchContent" placeholder="姓名或学号[部分]" autocomplete="on" value="" required="required"/>
+                <button id="btnsubmit" class="hidden" type="submit"></button>
+            </div>
+        </form>
+    </header>
+    <div class="container">
+        @if (Model.Count > 0)
+        {
+            <span class="btn btn-primary pointer margin-bottom-10" onclick="location.href = '/Admin/SendEmailToParts/@groupId'"><i class="icon-envelope"></i> 发送邮件通知</span>
+        }
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>姓名</th>
+                        <th>学号</th>
+                        @if (isFormal)
+                        {
+                            <th>性别</th>
+                        }
+                        <th>班级</th>
+                        <th>邮箱</th>
+                        @if (isFormal)
+                        {
+                            <th>电话</th>
+                        }
+                        <th>报名时间</th>
+                        <th>删除</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.StudentNo</td>
+                                    @if (isFormal)
+                                    {
+                                        if (item.Sex == "")
+                                        {
+                                            <td class="green">未填写</td>
+                                        }
+                                        else
+                                        {
+                                            <td>@((item.Sex == "M") ? "男" : "女")</td>
+                                        }
+
+                                    }
+                                    <td title="@item.StudentClass">@item.StudentClass</td>
+                                    <td title="@item.Email">@item.Email</td>
+                                    @if (isFormal)
+                                    {
+                                        if (item.Phone == "")
+                                        {
+                                            <td class="green">未填写</td>
+                                        }
+                                        else
+                                        {
+                                            <td>@item.Phone</td>
+                                        }
+
+                                    }
+                                    <td title="@item.CreateTime">@item.CreateTime</td>
+                                    <td>
+                                        <a onclick="swal({ title: '确定吗?', text: '删除这个报名者之后是不能恢复的!', type: 'warning', showCancelButton: true, confirmButtonColor: '#DD6B55', confirmButtonText: '确定',cancelButtonText:'取消' ,closeOnConfirm: false }, function () { location.href = '/Admin/DelParticipant/@item.Id?groupId=@groupId&page=@page' });" class="table-btn pointer">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @if (isSearch)
+        {
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("SearchParticipant", "Admin", new { id = groupId, searchContent = ViewBag.SearchContent, page }))
+        }
+        else
+        {
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("ShowParticipants", "Admin", new { id = groupId, page }))
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/Admin/ShowParticipants/ShowParticipants.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/ShowParticipants/ShowParticipants.js"></script>
+}

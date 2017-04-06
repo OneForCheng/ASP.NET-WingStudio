@@ -1,0 +1,60 @@
+﻿.update-info
+{
+    width:60%;
+    margin:auto;
+}
+
+.update-info .data-line
+{
+    margin-top:30px;
+    width:100%;
+    
+}
+
+.update-info .data-line .solid-line
+{
+    margin-top:10px;
+    margin-bottom:10px;
+    border:0;
+    background-color:#337ab7;
+    height:1px;
+}
+
+.update-info .data-line .input-style
+{
+    margin-top:5px;
+    margin-bottom:5px;
+    width:160px;
+    height:20px;
+}
+
+.update-info .data-line select
+{
+    margin-top:10px;
+    margin-bottom:5px;
+    width:160px;
+    height:20px;
+    font-size:12px;
+    padding:0;
+}
+
+.update-info .data-line .txt-title
+{
+    width:70px;
+}
+
+.update-info .data-line .btn_wrapper input
+{
+    margin-top:5px;
+    width:50px;
+    padding:5px;
+    font-size: 12px;
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .update-info
+    {
+        width:100%;
+    }
+}

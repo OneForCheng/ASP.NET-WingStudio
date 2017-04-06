@@ -1,0 +1,58 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Notice>
+
+@{
+    bool isLong = (ViewBag.IsLong == true);
+    ViewBag.Title = "公告";
+}
+
+<div class="body-content">
+    <ul class="nav nav-tabs">
+        @if (isLong)
+        {
+            <li role="presentation">
+                <a href="@Url.Action("Notices", "Home",new { isLong = false })">最新公告</a>
+            </li>
+            <li role="presentation" class="active">
+                <a>长期公告</a>
+            </li>
+        }
+        else
+        {
+            <li role="presentation" class="active">
+                <a>最新公告</a>
+            </li>
+            <li role="presentation">
+                <a href="@Url.Action("Notices", "Home",new { isLong = true })">长期公告</a>
+            </li>
+        }
+    </ul>
+    <div class="main-info">
+        <ul>
+            @if (Model.Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <li onclick="location.href='@Url.Action("ShowNotice", "Home",new { Id = item.Id })'" class="pointer">
+                        <a>@item.Theme</a>
+                        <span class="date">@item.CreateTime.ToShortDateString()</span>
+                    </li>
+                }
+            }
+            else
+            {
+                <li><center><a class="red">暂无任何信息!</a></center></li>
+            }
+        </ul>
+    </div>
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Notices", "Home", new { isLong, page }))
+</div>
+
+@section Styles{
+    <link href="~/Content/Home/Notices/Notices.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/Notices/Notices.js"></script>
+}

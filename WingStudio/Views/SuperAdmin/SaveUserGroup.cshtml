@@ -1,0 +1,180 @@
+﻿@model WingStudio.Models.UserGroup
+
+@{
+    bool isModified = (ViewBag.IsModified == true);
+    string action = "AddUserGroup";
+    if (isModified)
+    {
+        action = "ModUserGroup";
+        ViewBag.Title = "修改用户组";
+    }
+    else
+    {
+        ViewBag.Title = "添加用户组";
+    }
+}
+
+<section class="widget">
+    <header>
+        @if (isModified)
+        {
+            <span class="table-header"><i class="icon-edit"></i> 修 改 用 户 组</span>
+        }
+        else
+        {
+            <span class="table-header"><i class="icon-plus"></i> 添 加 用 户 组</span>
+        }
+    </header>
+    <div class="container">
+        @using (Html.BeginForm(action, "SuperAdmin", FormMethod.Post, new { @class = "form-group", @role = "form", onsubmit = "return Checkform()" }))
+        {
+            @Html.TextBoxFor(x => x.Authority, new { @class = "hidden", type = "text" })
+            <div class="form-group has-success has-feedback">
+                <div class="input-group">
+                    <span class="input-group-addon">组名</span>
+                    @Html.TextBoxFor(x => x.Theme, new { @class = "form-control", placeholder = "组名[不超过20个字]", type = "text", maxlength = "20", required = "required" })
+                </div>
+            </div>
+            if (isModified)
+            {
+                <div class="col-md-3">
+                    <div class="checkbox">
+                        <label>
+                            @if ((Model.Authority & 1) != 0)
+                            {
+                                <input type="checkbox" name="checkbox" value="1" checked="checked">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="checkbox" value="1">
+                            }
+                            管理公告权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            @if ((Model.Authority & 2) != 0)
+                            {
+                                <input type="checkbox" name="checkbox" value="2" checked="checked">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="checkbox" value="2">
+                            }
+                            管理动态权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            @if ((Model.Authority & 4) != 0)
+                            {
+                                <input type="checkbox" name="checkbox" value="4" checked="checked">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="checkbox" value="4">
+                            }
+                            管理博客权限
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="checkbox">
+                        <label>
+                            @if ((Model.Authority & 8) != 0)
+                            {
+                                <input type="checkbox" name="checkbox" value="8" checked="checked">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="checkbox" value="8">
+                            }
+                            管理文件权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            @if ((Model.Authority & 16) != 0)
+                            {
+                                <input type="checkbox" name="checkbox" value="16" checked="checked">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="checkbox" value="16">
+                            }
+                            管理报名权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            @if ((Model.Authority & 32) != 0)
+                            {
+                                <input type="checkbox" name="checkbox" value="32" checked="checked">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="checkbox" value="32">
+                            }
+                            管理消息权限
+                        </label>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-3">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="checkbox" value="1">
+                            管理公告权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="checkbox" value="2">
+                            管理动态权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="checkbox" value="4">
+                            管理博客权限
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="checkbox" value="8">
+                            管理文件权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="checkbox" value="16">
+                            管理报名权限
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="checkbox" value="32">
+                            管理消息权限
+                        </label>
+                    </div>
+                </div>
+            }
+            <div class="input-line">
+                <button type="submit" class="form-control btn-primary input-col-4">提交</button>
+                <button class="form-control btn-primary input-col-4" onclick="history.go(-1);">取消</button>
+            </div>
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/SuperAdmin/SaveUserGroup/SaveUserGroup.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/SuperAdmin/SaveUserGroup/SaveUserGroup.js"></script>
+}

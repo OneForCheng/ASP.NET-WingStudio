@@ -1,0 +1,104 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.BlogGroup>
+@{
+    ViewBag.Title = "博客专栏";
+    string controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-sm-12 col-md-9 col-lg-9">
+            <div class="solid-column">
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                    <div class="thumbnail">
+                        <a href="@Url.Action("ColumnNewBlogs", controller)" title="最新博客">
+                            <img src="~/Content/Images/Shared/Icon/NewBlogGroup.jpg" />
+                        </a>
+                        <div class="caption">
+                            <a href="@Url.Action("ColumnNewBlogs", controller)" title="最新博客">
+                                <h2>最新博客</h2>
+                            </a>
+                        </div>
+                    </div>                    
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                    <div class="thumbnail">
+                        <a href="@Url.Action("ColumnHotBlogs", controller)" title="最热博客">
+                            <img src="~/Content/Images/Shared/Icon/HotBlogGroup.jpg" />
+                        </a>
+                        <div class="caption">
+                            <a href="@Url.Action("ColumnHotBlogs", controller)" title="最热博客">
+                                <h2>最热博客</h2>
+                            </a>
+                        </div>
+                    </div>                   
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                    <div class="thumbnail">
+                        <a href="@Url.Action("ColumnPraiseBlogs", controller)" title="强推博客">
+                            <img src="~/Content/Images/Shared/Icon/PraiseBlogGroup.jpg" />
+                        </a>
+                        <div class="caption">
+                            <a href="@Url.Action("ColumnPraiseBlogs", controller)" title="强推博客">
+                                <h2>强推博客</h2>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="clear-both"/>
+            <div class="row">
+                @if (Model.Count > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        <div class="col-xs-6 col-sm-4 col-md-3">
+                            <div class="thumbnail">
+                                <a href="@Url.Action("ColumnBlogs", controller, new { id = item.Id })" title="@item.Description">
+                                    <img src="~/Content/Images/Shared/Icon/@item.Icon" />
+                                </a>
+                                <div class="caption">
+                                    <a href="@Url.Action("ColumnBlogs", controller, new { id = item.Id })" title="@item.Theme (@item.Blogs.Count)">
+                                        <h2>@item.Theme <span class="badge" title="文章总数">@item.Blogs.Count</span></h2>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-xs-12 text-center">
+                        @Html.PagedListPager((IPagedList)Model, page => Url.Action("BlogColumn", controller, new { page }))
+                    </div>
+                }
+                else
+                {
+                    <center><p class="red">暂无任何博客专栏!</p></center>
+                }
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-xs-12 col-md-3 col-lg-3">
+            <div class="panel panel-info">
+                <div class="panel-body">
+                   @using (Html.BeginForm("SearchPublicBlog", controller, FormMethod.Get, new { role = "form" }))
+                   {
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="searchContent" placeholder="博客" required="required">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default search-btn">搜索</button>
+                        </div>
+                    </div>
+                   }
+                </div>
+            </div>
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+   <link href="~/Content/Shared/BlogColumn/BlogColumn.css" rel="stylesheet" />
+}
+
+@section Scripts{
+   <script src="~/Content/Shared/BlogColumn/BlogColumn.js"></script>
+}

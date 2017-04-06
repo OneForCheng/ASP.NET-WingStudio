@@ -1,0 +1,124 @@
+﻿.content-box
+{
+    padding-top:20px;
+}
+
+/*====左侧栏====*/
+.content-box .side-left .sub-title
+{
+    font-size:22px;
+    font-weight: 600;
+    font-family:'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+    text-shadow:0px 0px 10px #777;
+}
+
+.content-box .side-left .sub-title img
+{
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    border: 1px solid rgba(0,0,0,.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,.1);
+    width:40px;
+    height:40px;
+}
+
+.content-box .side-left .blog-info .title
+{
+    font-size:16px;
+    line-height:20px;
+    font-family:'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+}
+
+.content-box .side-left .blog-info .title .type
+{
+    font-size:12px;
+    color:#ccc;
+}
+
+.content-box .side-left .blog-info .brief
+{
+    margin-top:10px;
+    font-size:12px;
+}
+
+.content-box .side-left .blog-info .brief a
+{
+    text-decoration:underline;
+}
+
+.content-box .side-left .blog-info .description
+{
+    margin-top:10px;
+    text-align:right;
+}
+.content-box .side-left .blog-info .description p
+{
+    font-size:13px;
+    font-family:'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+    line-height:16px;
+    color:#777;
+}
+
+.content-box .side-left .blog-info .description p a
+{
+    color:#39adb4;
+}
+
+ @media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+     .content-box .side-left .sub-title
+     {
+         font-size:20px;
+     }
+     .content-box .side-left .sub-title img
+     {
+         height:30px;
+         width:30px;
+     }
+    .content-box .side-left .blog-info .description
+    {
+        text-align:left;
+    }
+}
+
+ /*====右侧栏====*/
+
+ .content-box .side-right .input-group input
+{
+    font-size:10px;
+    border-color: #bce8f1;
+}
+
+.content-box .side-right .input-group .dropdown-toggle
+{
+    border-color: #bce8f1;
+}
+
+ .content-box .side-right .input-group .search-btn
+{
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.content-box .side-right .input-group .search-btn:hover,
+.content-box .side-right .input-group .search-btn:focus
+{
+    background-color: #bce8f1;
+    border-color: #2294ca;
+}
+
+
+.content-box .side-right .panel .panel-heading
+{
+    text-align:center;
+}
+
+.content-box .side-right .list-group 
+{
+    text-align:center;
+}
+
+.content-box .side-right .list-group .glyphicon
+{
+    color:#ccc;
+}

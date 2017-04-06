@@ -1,0 +1,75 @@
+﻿@model WingStudio.Models.Application
+@{
+    bool isModified = (ViewBag.IsModified == true);
+    string action = "AddApplication";
+    if (isModified)
+    {
+        action = "ModApplication";
+        ViewBag.Title = "更改报名";
+    }
+    else
+    {
+        ViewBag.Title = "添加报名";
+    }
+}
+
+<section class="widget">
+    <header>
+        @if (isModified)
+        {
+            <span class="table-header"><i class="icon-edit"></i> 修 改 报 名</span>
+        }
+        else
+        {
+            <span class="table-header"><i class="icon-plus"></i> 添 加 报 名</span>
+        }
+    </header>
+    <div class="container">
+        @using (Html.BeginForm(action, "Admin", FormMethod.Post, new { @class = "form-group", @role = "form", onsubmit = "return Checkform()" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="input-line">
+                <div class="input-col-1">
+                    <label for="Theme" class="margin-bottom-10">主题:<!--[if lt IE 10]><span class="red"> [最长40个字]</span><![endif]--></label>
+                    @Html.TextBoxFor(x => x.Theme, new { @class = "form-control", placeholder = "报名主题[最长40个字]", type = "text", maxlength = "40", required = "required" })
+                </div>
+            </div>
+            <div class="input-checkbox">
+                <label for="IsFormal" class="txt-checkbox">正式报名:</label>
+                @Html.CheckBoxFor(x => x.IsFormal, new { @class = "form-control" })
+            </div>
+            <div class="input-line">
+                <div class="input-col-2">
+                    <label for="StartTime" class="margin-bottom-10">开始时间:</label>
+                    @Html.TextBoxFor(x => x.StartTime, new { @class = "datainp indate form-control", placeholder = "开始时间", type = "text", required = "required" })
+                </div>
+                <div class="input-col-2">
+                    <label for="EndTime" class="margin-bottom-10">截止时间:</label>
+                    @Html.TextBoxFor(x => x.EndTime, new { @class = "datainp indate form-control", placeholder = "截止时间", type = "text", required = "required" })
+                </div>
+            </div>
+            <div class="input-line">
+                <div class="input-col-1">
+                    <label for="Content" class="margin-bottom-10">内容:</label>
+                    @Html.EditorFor(x => x.Content)
+                </div>
+            </div>
+            <div class="input-line">
+                <button type="submit" class="form-control btn-primary input-col-4">保存</button>
+                <button type="button" class="form-control btn-primary input-col-4" onclick="history.go(-1)">取消</button>
+            </div>
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Scripts/UEditor/themes/default/css/ueditor.css" rel="stylesheet" />
+    <link href="~/Content/Admin/SaveApplication/SaveApplication.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Scripts/UEditor/ueditor.config.js"></script>
+    <script src="~/Scripts/UEditor/ueditor.all.js"></script>
+    <script src="~/Scripts/jedate/jedate.js"></script>
+    <script src="~/Content/Admin/SaveApplication/SaveApplication.js"></script>
+}

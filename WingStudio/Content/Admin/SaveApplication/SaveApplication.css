@@ -1,0 +1,67 @@
+﻿section.widget
+{
+   height:800px;
+}
+.input-line
+{
+    width:100%;
+}
+
+.input-line .input-col-1
+{
+    clear:both;
+    margin-left:5%;
+    width:90%;
+}
+
+.input-line .input-col-1 textarea
+{
+    vertical-align:top;
+}
+
+.input-line .input-col-2
+{
+    margin-left:5%;
+    float:left;
+    width:40%;
+}
+.input-line .input-col-4
+{
+    margin-top:20px;
+    margin-left:5%;
+    float:left;
+    width:10%;
+}
+
+
+section.widget .container .input-checkbox
+{
+   margin-bottom:15px;
+}
+
+section.widget .container .input-checkbox .txt-checkbox
+{
+    margin-top:1px;
+    margin-right:5px;
+    margin-left:5%;
+    float:left;
+}
+
+section.widget .container .input-checkbox input
+{
+    margin-left:5%;
+	width: 15px;
+    height:15px;
+}
+
+@media (max-width: 767px)
+{
+    .input-line .input-col-2, .input-line .input-col-4
+    {
+        width:90%;
+    }
+    section.widget
+    {
+        height:1000px;
+    }
+}

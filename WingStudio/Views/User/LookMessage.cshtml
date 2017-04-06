@@ -1,0 +1,30 @@
+﻿@model WingStudio.Models.Message
+
+@{
+    ViewBag.Title = "查看消息";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="title">
+            <span>@Model.Theme</span>
+        </div>
+        <div class="other-infor">
+            <span class="time">@Model.CreateTime.ToString()</span>
+            <span class="owner">发送者:@ViewBag.Owner</span>
+        </div>
+        <div class="main-infor">
+            <div class="content" id="html_content" style="display:none;">@Model.Content</div>
+            <p class="text-right margin-top-10"><a href="@Url.Action("ReadingMsg","User")">返回</a></p>
+        </div>
+        
+</div>
+</div>
+
+@section Styles{
+   <link href="~/Content/User/LookMessage/LookMessage.css" rel="stylesheet" />
+}
+
+@section Scripts{
+   <script src="~/Content/User/LookMessage/LookMessage.js"></script>
+}

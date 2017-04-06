@@ -1,0 +1,46 @@
+﻿.btn-primary{
+    margin-bottom:10px;
+	background: #208ed3;
+	border: 1px solid #208ed3;
+}
+.btn-primary:hover{
+	color: #fff;
+    background-color: #333;
+    border-color: #333;
+}
+
+.input-line
+{
+    width:100%;
+}
+
+.input-line .input-col-2
+{
+    margin-left:5%;
+    float:left;
+    width:40%;
+}
+.input-line .input-col-2 select
+{
+    margin-bottom:15px;
+}
+
+.input-line .input-col-4
+{
+    margin-left:5%;
+    float:left;
+    width:10%;
+}
+
+@media (max-width: 767px)
+{
+    .input-line .input-col-2, .input-line .input-col-4
+    {
+        width:90%;
+    }
+   
+    section.content .widget
+    {
+        height:650px;
+    }
+}

@@ -1,0 +1,212 @@
+﻿/*整体布局*/
+body
+{
+    padding-top:50px;
+    background: #f5f5f5;
+}
+
+.body-content
+{
+    padding:10px;
+    min-height:550px;
+    background: #fff;
+}
+
+.body-footer
+{
+    border-top:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+    background: #fff;
+}
+
+a,a:hover,a:focus
+{
+    text-decoration:none;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+textarea
+{
+    resize:none;
+}
+
+.cursor-default
+{
+    cursor:default;
+}
+
+/* 顶部导航 */
+.navbar-inverse {
+    font-family: 'Microsoft YaHei UI','Microsoft YaHei', sans-serif;
+}
+
+.navbar .container .navbar-header img
+{
+    height:30px;
+    margin-top:-5px;
+}
+
+.navbar-collapse .navbar-nav .dropdown-menu {
+	min-width: 120px;
+    background-color: rgba(0,0,0,.85);
+	-webkit-box-shadow: 0 3px 8px rgba(0,0,0,0.125);
+	-moz-box-shadow: 0 3px 8px rgba(0,0,0,0.125);
+	box-shadow: 0 3px 8px rgba(0,0,0,0.125);
+	border: 0;
+	padding: 0;
+	margin-top: 0;
+	border-top: 0;
+	border-radius: 0;
+	left: 0;
+}
+
+.navbar-collapse .navbar-nav .dropdown-menu:before {
+	position: absolute;
+	top: 0;
+}
+
+.navbar-collapse .navbar-nav .dropdown-menu>li>a {
+	padding: 8px 15px;
+	color: #fff;
+}
+
+.navbar-collapse .navbar-nav .dropdown-menu>li:hover>a,.navbar-collapse .navbar-nav .dropdown-menu>li:focus>a,.navbar-collapse .navbar-nav .dropdown-menu>li.active>a {
+	background-color: #c52d2f;
+	color: #fff;
+}
+
+.navbar-collapse .navbar-nav .dropdown-menu>li:last-child>a {
+	border-radius: 0 0 3px 3px;
+}
+
+.navbar-collapse .navbar-nav .dropdown-menu>li.divider {
+	background-color: transparent;
+}
+
+@media (min-width: 1200px) {
+	.dropdown:hover .dropdown-menu {
+		display: block;
+		-webkit-animation: fadeInUp 400ms;
+		animation: fadeInUp 400ms;
+	}
+}
+
+@media (min-width: 992px) and (max-width: 1199px)
+{
+    .dropdown:hover .dropdown-menu {
+		display: block;
+		-webkit-animation: fadeInUp 400ms;
+		animation: fadeInUp 400ms;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        -webkit-animation: fadeInUp 400ms;
+        animation: fadeInUp 400ms;
+    }
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .navbar .container .navbar-header img
+    {
+         height:22px;
+         margin-top:0;
+    }
+}
+
+/*登录面板*/
+.login-panel
+{
+    position:fixed;
+    top: 30%;
+    left: 35%;
+    width: 30%;
+    z-index:1000;
+    border:8px solid rgba(0,0,0,0.2);
+}
+
+.login-panel .panel
+{
+    margin-bottom:0;
+    border-radius:0;
+}
+
+.login-panel .panel .panel-heading button
+{
+    width: 20px;
+    height: 20px;
+    background-color:#464646;
+    color:#fff;
+    font-weight: 400;
+    font-size:16px;
+    border-radius:3px;
+}
+
+.login-panel .panel .panel-body .error-msg
+{
+    color:red;
+    margin-bottom:5px;
+}
+
+.login-panel .panel .panel-body .input-group
+{
+    margin-bottom:10px;
+}
+
+.login-panel .panel .panel-body .input-group .fpwd-validcode
+{
+    height:34px;
+    width:66px;
+    border-top-left-radius:4px;
+    border-bottom-left-radius:4px;
+}
+
+.login-panel .panel .panel-body button.btn-lg
+{
+    border-radius:3px;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .login-panel
+    {
+         left: 25%;
+         width: 50%;
+    }
+}
+
+@media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+     body>div.container
+    {
+        padding:0;
+    }
+    .body-content .title .title-deck
+    {
+        display:none;
+    }
+    .login-panel
+    {
+         left: 10%;
+         width: 80%;
+    }
+}
+
+/*分页按钮*/
+ul.pagination>li>a
+{
+    font-size:10px;
+    padding:2px 7px;
+}
+
+/*富文本图片自适应*/
+#html_content img
+{
+    max-width:100%;
+}

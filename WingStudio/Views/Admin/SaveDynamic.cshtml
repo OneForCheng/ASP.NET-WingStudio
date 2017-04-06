@@ -1,0 +1,68 @@
+﻿@model WingStudio.Models.Dynamic
+@{
+    bool isModified = (ViewBag.IsModified == true);
+    string action = "AddDynamic";
+    if (isModified)
+    {
+        action = "ModDynamic";
+        ViewBag.Title = "修改动态";
+    }
+    else
+    {
+        ViewBag.Title = "添加动态";
+    }
+}
+
+<section class="widget">
+    <header>
+        @if (isModified)
+        {
+            <span class="table-header"><i class="icon-edit"></i> 修 改 动 态</span>
+        }
+        else
+        {
+            <span class="table-header"><i class="icon-plus"></i> 添 加 动 态</span>
+        }
+    </header>
+    <div class="container">
+        @using (Html.BeginForm(action, "Admin", FormMethod.Post, new { @class = "form-group", @role = "form", onsubmit = "return Checkform()" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="input-line">
+                <div class="input-col-1">
+                    <label for="Theme" class="margin-bottom-10">主题:<!--[if lt IE 10]><span class="red"> [最长40个字]</span><![endif]--></label>
+                    @Html.TextBoxFor(x => x.Theme, new { @class = "form-control", placeholder = "动态主题[最长40个字]", type = "text", maxlength = "40", required = "required" })
+                </div>
+            </div>
+            <div class="input-checkbox">
+                <label for="IsFormal" class="txt-checkbox">正式动态:</label>
+                @Html.CheckBoxFor(x => x.IsFormal, new { @class = "form-control" })
+            </div>
+            <div class="input-checkbox">
+                <label for="IsPublic" class="txt-checkbox">是否发布:</label>
+                @Html.CheckBoxFor(x => x.IsPublic, new { @class = "form-control" })
+            </div>
+            <div class="input-line">
+                <div class="input-col-1">
+                    <label for="Content" class="margin-bottom-10">内容:</label>
+                    @Html.EditorFor(x => x.Content)
+                </div>
+            </div>
+            <div class="input-line">
+                <button type="submit" class="form-control btn-primary input-col-4">保存</button>
+                <button type="button" class="form-control btn-primary input-col-4" onclick="history.go(-1)">取消</button>
+            </div>
+        }
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Scripts/UEditor/themes/default/css/ueditor.css" rel="stylesheet" />
+    <link href="~/Content/Admin/SaveDynamic/SaveDynamic.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Scripts/UEditor/ueditor.config.js"></script>
+    <script src="~/Scripts/UEditor/ueditor.all.js"></script>
+    <script src="~/Content/Admin/SaveDynamic/SaveDynamic.js"></script>
+}

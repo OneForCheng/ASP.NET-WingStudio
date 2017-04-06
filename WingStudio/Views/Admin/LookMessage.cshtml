@@ -1,0 +1,35 @@
+﻿@model WingStudio.Models.Message
+@{
+    ViewBag.Title = "查看消息";
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-eye-open"></i> 查 看 消 息</span>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="title">
+                <span>@Model.Theme</span>
+            </div>
+            <div class="other-infor">
+                <span class="time">@Model.CreateTime.ToString()</span>
+                <span class="owner">发送者:@ViewBag.Owner</span>
+            </div>
+            <div class="main-infor">
+                <div class="content" id="html_content" style="display:none;">@Model.Content</div>
+                <p class="text-right margin-top-10"><a href="javascript:location.href=document.referrer;">返回</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Styles{
+    <link href="~/Content/Admin/LookMessage/LookMessage.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/LookMessage/LookMessage.js"></script>
+}
+

@@ -1,0 +1,27 @@
+﻿.content-box
+{
+    padding-top:30px;
+    margin:0 10%;
+}
+
+.content-box .table-responsive
+{
+    padding:5px;
+    font-size:12px;
+    width:90%;
+    padding-top:30px;
+    margin:auto;
+}
+
+ @media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .content-box
+    {
+         margin:0;
+    }
+    .content-box .table-responsive
+    {
+        width:100%;
+    }
+    
+}

@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewBag.Title = "找回密码";
+}
+
+<div class="reset-panel">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title"><strong>找回密码</strong></h2>
+        </div>
+        <div class="panel-body">
+            <div class="error-msg" id="reset_error_msg"></div>
+            @using (Html.BeginForm("ResetPassword", "Home", FormMethod.Post, new { @role = "form", onsubmit = "return CheckResetPwdForm()" }))
+            {
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">账号&nbsp;&nbsp;&nbsp;</button>
+                    </div>
+                    <input class="form-control" id="rpwd_account" maxlength="20" name="account" required="required" type="text" value="">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">重置码</button>
+                    </div>
+                    <input class="form-control" id="rpwd_code" maxlength="40" name="code" required="required" type="text" value="">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default cursor-default">新密码</button>
+                    </div>
+                    <input class="form-control" id="rpwd_password" maxlength="20" name="newPassword" placeholder="新密码[6-20个字母或数字]" required="required" type="password" value="">
+                </div>
+                <button type="submit" class="btn btn-block btn-lg btn-info">重设密码</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/Home/Find/Find.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Home/Find/Find.js"></script>
+}
+

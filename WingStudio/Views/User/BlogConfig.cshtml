@@ -1,0 +1,108 @@
+﻿@model UserConfig
+
+@{
+    ViewBag.Title = "博客设置 - 博客后台";
+}
+
+<div class="body-content">
+    <div class="content-box">
+        <div class="side-left col-xs-12 col-xs-12 col-md-2 col-lg-2">
+            <div class="panel panel-success">
+                <div class="panel-heading">操作</div>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="/User/ResetBlogConfig"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 恢复默认</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="side-right col-xs-12 col-sm-12 col-md-10 col-lg-10">
+            <ul class="nav nav-tabs">
+                <li role="presentation"><a href="/User/ManageBlog?type=jotting">随笔</a></li>
+                <li role="presentation"><a href="/User/ManageBlog?type=article">文章</a></li>
+                <li role="presentation"><a href="/User/ManageBlog?type=diary">日记</a></li>
+                <li role="presentation"><a href="/User/Favorites">收藏</a></li>
+                <li role="presentation" class="active"><a href="/User/BlogConfig">设置</a></li>
+            </ul>
+            @{
+                UserConfig userConfig = ViewBag.UserConfig;
+                using (Html.BeginForm("SaveBlogConfig", "User", FormMethod.Post, new { @role = "form", enctype = "multipart/form-data", onsubmit = "return Checkform()" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <td class="td_title">
+                                        外部博客主页:
+                                    </td>
+                                    <td class="td_content">
+                                        @Html.CheckBoxFor(m => m.PublicBlog, new { @class = "checkfor" })
+                                    </td>
+                                    @if (Model.PublicBlog)
+                                    {
+                                        <td class="tip">已开启，游客可通过 <a href="/Blogs/@ViewBag.Account">@(Request.Url.AbsoluteUri.Replace(Request.RawUrl, "") + "/Blogs/" + ViewBag.Account)</a> 访问自己的外部博客主页</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="tip">未开启，游客只能访问已被收录于外部专栏中的博客</td>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="td_title">
+                                        默认编辑器:
+                                    </td>
+                                    <td class="td_content">
+                                        @if (Model.BlogEditor == BlogEditor.Baidu)
+                                        {
+                                            <div class="radio-line">
+                                                <input class="radio-input" id="BlogEditor_baidu" type="radio" name="BlogEditor" value="0" checked="checked">
+                                                <strong class="radio-label">百度富文本(推荐)</strong>
+                                            </div>
+                                            <div  class="radio-line">
+                                                <input class="radio-input" id="BlogEditor_md" type="radio" name="BlogEditor" value="1">
+                                                <span class="radio-label">Markdown</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div  class="radio-line">
+                                                <input class="radio-input" id="BlogEditor_baidu" type="radio" name="BlogEditor" value="0">
+                                                <strong class="radio-label">百度富文本(推荐)</strong>
+                                            </div>
+                                            <div  class="radio-line">
+                                                <input class="radio-input" id="BlogEditor_md" type="radio" name="BlogEditor" value="1" checked="checked">
+                                                <label class="radio-label">Markdown</label>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="tip"></td>
+                                </tr>
+                                <tr>
+                                    <td class="td_title"></td>
+                                    <td class="td_content">
+                                        <div class="btn_wrapper">
+                                            <input type="submit" value="保存">
+                                            <input type="button" onclick="history.go(-1);" value="取消">
+                                        </div>
+                                    </td>
+                                    <td class="red" id="error_msg"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            }
+            
+        </div>
+        <div class="clear-both"></div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/Content/User/ManageBlog/ManageBlog.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/User/ManageBlog/ManageBlog.js"></script>
+}

@@ -1,0 +1,125 @@
+﻿body
+{
+    overflow-x:hidden;
+} 
+.red
+{
+    color:Red;
+}
+.blue
+{
+    color:Blue;    
+}
+.white
+{
+    color:white;
+}
+.green
+{
+    color:green;
+}
+.gray
+{
+    color:gray;
+}
+.skyblue
+{
+    color:#39adb4;
+}
+.pointer
+{
+    cursor:pointer;
+}
+.clear-both
+{
+    clear:both;
+}
+.font-12
+{
+    font-size:12px;
+}
+.font-14
+{
+    font-size:12px;
+}
+.font-16
+{
+    font-size:12px;
+}
+.margin-bottom-10
+{
+    margin-bottom:10px;
+}
+.margin-top-10
+{
+    margin-top:10px;
+}
+.margin-left-10
+{
+    margin-left:10px;
+}
+.margin-left-20
+{
+    margin-left:20px;
+}
+.margin-right-10
+{
+    margin-right:10px;
+}
+.margin-right-20
+{
+    margin-right:20px;
+}
+.float-left
+{
+    float:left;
+}
+.float-right
+{
+    float:right;
+}
+.text-left
+{
+    text-align:left;
+}
+
+.text-right
+{
+    text-align:right;
+}
+
+table a,
+table a:hover,
+table a:focus
+{
+    text-decoration:none;
+}
+
+/*返回顶部*/
+#toTop 
+{
+    z-index:1000;
+    position: fixed;
+    bottom: 10px;
+    right: 2%;
+    overflow: hidden;
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    padding-top:4px;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: white;
+    text-decoration:none;
+    display:none;
+    font-size:26px;
+}
+
+#toTop:hover 
+{
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}

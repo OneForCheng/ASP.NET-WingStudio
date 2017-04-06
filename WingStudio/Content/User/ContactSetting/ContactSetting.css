@@ -1,0 +1,68 @@
+﻿.content-box
+{
+    padding-top:50px;
+    margin:0 10%;
+}
+
+ .content-box .update-info
+{
+    font-size:12px;
+    width:80%;
+    padding-top:30px;
+    margin:auto;
+}
+
+.content-box .update-info table td
+{
+    vertical-align:middle;
+}
+
+.content-box .update-info table td .input-style
+{
+    margin-top:5px;
+    margin-bottom:5px;
+    width:200px;
+    height:20px;
+}
+
+ .content-box .update-info table td .btn_wrapper input
+{
+    width:50px;
+    padding:5px;
+    font-size: 12px;
+    font-family: Arial;
+    color: #606060;
+    border: 1px solid #e3e3e3;
+    background: #fff;
+    margin-left:10px;
+    margin-top:5px;
+    margin-bottom:5px;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.content-box .update-info table td .btn_wrapper input:hover
+{
+    border-color:#5daced;
+}
+
+.content-box .update-info table tr .tip
+{
+    color:green;
+}
+
+ @media only screen and (max-width: 767px), only screen and (max-device-width: 767px) 
+{
+    .content-box
+    {
+         margin:0;
+    }
+     .content-box .update-info
+     {
+         width:100%;
+     }
+}

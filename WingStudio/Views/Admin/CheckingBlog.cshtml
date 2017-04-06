@@ -1,0 +1,80 @@
+﻿@using WingStudio.Models;
+@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WingStudio.Models.Blog>
+
+@{
+    ViewBag.Title = "审核博客";
+}
+
+<section class="widget">
+    <header>
+        <span class="table-header"><i class="icon-file-text"></i> 审 核 博 客</span>
+    </header>
+    <div class="container">
+        <div class="panel panel-default table-responsive">
+            <table class="table-style">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>标题</th>
+                        <th>类型</th>
+                        <th>发布人</th>
+                        <th>发布时间</th>
+                        <th>查看</th>
+                        <th>标记已审</th>
+                    </tr>
+                </thead>
+                @if (Model.Count > 0)
+                {
+                    <tbody>
+                        @{
+                            int page = ViewBag.PageNumber;
+                            int i = (page - 1) * 10;
+                            Dictionary<BlogType, string> dic = new Dictionary<BlogType, string> {
+                                {BlogType.Jotting,"随笔"},
+                                {BlogType.Article,"文章"},
+                                {BlogType.Diary,"日记"},
+                            };
+                            foreach (var item in Model)
+                            {
+                                i++;
+                                var publicTime = ((DateTime)item.PublicTime).ToShortDateString();
+                                <tr>
+                                    <td>@i</td>
+                                    <td title="@item.Theme">@item.Theme</td>
+                                    <td class="green">@dic[item.Type]</td>
+                                    <td title="@item.Owner.Account（@item.Owner.Name）">@item.Owner.Account（@item.Owner.Name）</td>
+                                    <td title="@publicTime">@publicTime</td>
+                                    <td>
+                                        <a href="/Admin/ShowBlog/@item.Id" class="table-btn">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/BlogPassCheck/@item.Id" class="table-btn pointer">
+                                            <i class="icon-ok"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                            }
+            </table>
+            @if (Model.Count == 0)
+            {
+                <center><p class="blank-data">暂无任何数据!</p></center>
+            }
+        </div>
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("CheckingBlog", "Admin", new { page }))
+    </div>
+</section>
+
+@section Styles{
+    <link href="~/Content/Admin/CheckingBlog/CheckingBlog.css" rel="stylesheet" />
+}
+
+@section Scripts{
+    <script src="~/Content/Admin/CheckingBlog/CheckingBlog.js"></script>
+}
