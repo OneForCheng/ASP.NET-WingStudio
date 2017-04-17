@@ -1,12 +1,11 @@
-﻿@using WingStudio.Models;
-@model WingStudio.Models.Blog
+﻿@model WingStudio.Models.Blog
 
 @{
 
     Blog lastBlog = ViewBag.LastBlog;
     Blog nextBlog = ViewBag.NextBlog;
     User logined = ViewBag.Logined;
-    string typeText = "";
+    var typeText = "";
     if (Model.Type == BlogType.Jotting)
     {
         typeText = "随笔: ";
@@ -72,7 +71,7 @@
                 {
                     <div class="tag">
                         标签:
-                        @for (int i = 0; i < count - 1; i++)
+                        @for (var i = 0; i < count - 1; i++)
                         {
                             <a href="@Url.Action("SearchTagBlog","User", new { searchContent = subStrs[i] })">@subStrs[i]</a>
                             <span>,</span>

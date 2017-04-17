@@ -1,8 +1,7 @@
-﻿@using WingStudio.Models;
-@model Blog
+﻿@model Blog
 @{
     bool isModified = (ViewBag.IsModified == true);
-    string action = "AddBlog";
+    var action = "AddBlog";
     BlogType blogType = ViewBag.BlogType;
     BlogEditor blogEditor = ViewBag.BlogEditor;
     if (isModified)
@@ -135,10 +134,10 @@
                             @Html.TextBoxFor(x => x.IsPublic, new { @class = "hidden" })
                             <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(true); return true;">发布草稿</button>
                             <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(false); return true;">保存草稿</button>
-                            if (blogType == BlogType.Jotting)
+                            @*if (blogType == BlogType.Jotting)
                             {
                                 <button type="button" class="btn-danger" onclick="BlogToTopList(@Model.Id)">入榜</button>
-                            }
+                            }*@
                             <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
 
                         }
@@ -155,10 +154,10 @@
                             @Html.TextBoxFor(x => x.IsPublic, new { @class = "hidden" })
                             <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(true); return true;">发布</button>
                             <button type="submit" class="btn-primary" onclick="$('#IsPublic').val(false); return true;">存为草稿</button>
-                            if (blogType == BlogType.Jotting)
+                            @*if (blogType == BlogType.Jotting)
                             {
                                 <button type="button" class="btn-danger" onclick="BlogToTopList(0)">入榜</button>
-                            }
+                            }*@
                             <button type="button" class="btn-primary" onclick="history.go(-1)">取消</button>
                         }
                     }

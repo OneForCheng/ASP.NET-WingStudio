@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -87,7 +86,7 @@ public class Crawler
                 byte[] bytes;
                 using (var ms = new MemoryStream())
                 {
-                    byte[] buffer = new byte[4096];
+                    var buffer = new byte[4096];
                     int count;
                     while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
                     {
@@ -113,9 +112,9 @@ public class Crawler
         {
             case UriHostNameType.Dns:
                 var ipHostEntry = Dns.GetHostEntry(uri.DnsSafeHost);
-                foreach (IPAddress ipAddress in ipHostEntry.AddressList)
+                foreach (var ipAddress in ipHostEntry.AddressList)
                 {
-                    byte[] ipBytes = ipAddress.GetAddressBytes();
+                    var ipBytes = ipAddress.GetAddressBytes();
                     if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     {
                         if (!IsPrivateIP(ipAddress))
@@ -137,7 +136,7 @@ public class Crawler
         if (IPAddress.IsLoopback(myIPAddress)) return true;
         if (myIPAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
         {
-            byte[] ipBytes = myIPAddress.GetAddressBytes();
+            var ipBytes = myIPAddress.GetAddressBytes();
             // 10.0.0.0/24 
             if (ipBytes[0] == 10)
             {

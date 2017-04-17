@@ -1,10 +1,6 @@
 <%@ WebHandler Language="C#" Class="UEditorHandler" %>
 
-using System;
 using System.Web;
-using System.IO;
-using System.Collections;
-using Newtonsoft.Json;
 
 public class UEditorHandler : IHttpHandler
 {

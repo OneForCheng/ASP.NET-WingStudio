@@ -1,9 +1,8 @@
-﻿@using WingStudio.Models;
-@model WingStudio.Models.FileGroup
+﻿@model WingStudio.Models.FileGroup
 
 @{
     bool isModified = (ViewBag.IsModified == true);
-    string action = "AddFileGroup";
+    var action = "AddFileGroup";
     if (isModified)
     {
         action = "ModFileGroup";

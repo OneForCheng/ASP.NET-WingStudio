@@ -1,7 +1,5 @@
-﻿@using WingStudio.Models;
-@using System.Text.RegularExpressions;
+﻿@using System.Text.RegularExpressions;
 @using PagedList.Mvc;
-@using PagedList;
 @model IPagedList<WingStudio.Models.Blog>
 @{
     User logined = ViewBag.Logined;
@@ -41,8 +39,8 @@
             <div class="sub-title">@title.Split('-').First()</div>
             @if (Model.Count > 0)
             {
-                string action = ViewContext.RouteData.Values["action"].ToString().ToLower();
-                Dictionary<BlogType, string> dic = new Dictionary<BlogType, string> {
+                var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+                var dic = new Dictionary<BlogType, string> {
                                 {BlogType.Jotting,"随笔"},
                                 {BlogType.Article,"文章"},
                                 {BlogType.Diary,"日记"},

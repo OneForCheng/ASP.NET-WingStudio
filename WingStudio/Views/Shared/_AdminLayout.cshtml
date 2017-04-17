@@ -1,7 +1,6 @@
-﻿@using WingStudio.Models;
-@{
-    WebAppContext entity = new WebAppContext();
-    bool isAdmin = User.IsInRole("Admin");
+﻿@{
+    var entity = new WebAppContext();
+    var isAdmin = User.IsInRole("Admin");
 }
 
 <!DOCTYPE html>
@@ -42,7 +41,7 @@
         <ul>
             @if (isAdmin)
             {
-                User logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
                 if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageNotice) != 0) > 0)
                 {
                     <li><a href="@Url.Action("ManageNotice", "Admin")" title="管理公告"><i class="icon-bullhorn"></i> 管理公告&nbsp;&nbsp;</a></li>
@@ -53,7 +52,7 @@
                 }
                 if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageBlog) != 0) > 0)
                 {
-                    int blogCount = entity.Blogs.Count(m => !m.Checked && m.IsPublic);
+                    var blogCount = entity.Blogs.Count(m => !m.Checked && m.IsPublic);
                     if (blogCount > 0)
                     {
                         <li><a href="@Url.Action("ManageBlog", "Admin")" title="管理博客"><i class="icon-file-text"></i> 管理博客&nbsp;&nbsp;</a><span class="tip-bubble-x" onclick="location.href='/Admin/CheckingBlog'" title="审查新博客">@blogCount</span></li>
@@ -66,7 +65,7 @@
                 }
                 if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageFile) != 0) > 0)
                 {
-                    int fileCount = entity.WebFiles.Count(m => !m.Checked);
+                    var fileCount = entity.WebFiles.Count(m => !m.Checked);
                     if (fileCount > 0)
                     {
                         <li><a href="@Url.Action("ManageFile", "Admin")" title="管理文件"><i class="icon-file"></i> 管理文件&nbsp;&nbsp;</a><span class="tip-bubble-x" onclick="location.href='/Admin/CheckingFile'" title="审查新文件">@fileCount</span></li>
@@ -83,7 +82,7 @@
                 }
                 if (logined.Groups.Count(m => (m.Authority & (int)AuthorityFlag.ManageMessage) != 0) > 0)
                 {
-                    int msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == 0) > 0);
+                    var msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == 0) > 0);
                     if (msgCount > 0)
                     {
                         <li><a href="@Url.Action("ManageReceivedMsg", "Admin")" title="管理消息"><i class="icon-envelope"></i> 管理消息&nbsp;&nbsp;</a><span class="tip-bubble-x" onclick="location.href = '/Admin/ReadingMsg'" title="查看新消息">@msgCount</span></li>

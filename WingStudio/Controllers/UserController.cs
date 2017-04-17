@@ -2,8 +2,6 @@
 using PagedList;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,14 +10,15 @@ using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using WingStudio.Models;
-using System.Threading.Tasks;
 
 namespace WingStudio.Controllers
 {
     [Authorize(Roles = "User")]
     public class UserController : BaseController
     {
-     
+
+        private User Loginer => Entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+
         #region 其它
         /// <summary>
         /// 个人主页
@@ -27,11 +26,11 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Index(int? page)
         {
-            ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            ViewBag.UserCount = entity.Users.Count();
+            ViewBag.Logined = Loginer;
+            ViewBag.UserCount = Entity.Users.Count();
             var timeLimit = DateTime.Now.AddMonths(-1);
 
-            var blogs = entity.Blogs.Where(m => m.IsPublic);
+            var blogs = Entity.Blogs.Where(m => m.IsPublic);
             //var files = entity.WebFiles.Where(m => m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Inner) != 0) > 0);
             //ViewBag.NewBlogs = blogs.OrderByDescending(m => m.PublicTime).Take(5);
             ViewBag.HotBlogs = blogs.Where(m => m.CreateTime > timeLimit).OrderByDescending(m => m.LookCount).Take(5);
@@ -40,7 +39,7 @@ namespace WingStudio.Controllers
 
             var pageNumber = page ?? 1;
             ViewBag.PageNumber = pageNumber;
-            var onePageOfProducts = entity.Users.OrderByDescending(m => m.Id).ToPagedList(pageNumber, 6);
+            var onePageOfProducts = Entity.Users.OrderByDescending(m => m.Id).ToPagedList(pageNumber, 6);
             return View(onePageOfProducts);
         }
 
@@ -55,7 +54,7 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult GetLoginUserInfo()
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             var userInfo = logined.UserInfo;
             var birthday = "";
             if (userInfo.Birthday != null)
@@ -87,8 +86,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult AccountSetting()
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            return View(logined);
+            return View(Loginer);
         }
 
         /// <summary>
@@ -101,15 +99,15 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidAccount(account))
             {
-                if (entity.Users.Count(m => m.Account == account) > 0 || entity.SuperUsers.Count(m => m.Account == account) > 0)
+                if (Entity.Users.Count(m => m.Account == account) > 0 || Entity.SuperUsers.Count(m => m.Account == account) > 0)
                 {
                     return Json(new { title = "修改失败", message = "该用户账号已存在!" });
                 }
                 else
                 {
-                    var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                    var logined = Loginer;
                     logined.Account = account;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Json(new { title = "修改成功", message = "成功修改用户账号!" });
                 }
             }
@@ -131,11 +129,11 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidPassword(oldPassword) && WebSecurity.IsValidPassword(newPassword))
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 if (AES.Encrypt(oldPassword) == logined.Password)
                 {
                     logined.Password = AES.Encrypt(newPassword);
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Json(new { title = "修改成功", message = "成功修改密码!" });
                 }
                 else
@@ -160,14 +158,14 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidSecQusetion(qusetion, answer))
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 var flag = (SecurityFlag)qusetion;
                 logined.SecQuestion = flag;
                 if (flag != SecurityFlag.None)
                 {
                     logined.SecAnswer = AES.Encrypt(answer.Trim());
                 }
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Json(new { title = "修改成功", message = "成功修改安全提问!" });
             }
             else
@@ -185,9 +183,9 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidEmail(email))
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 logined.Email = email;
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Json(new { title = "修改成功", message = "成功修改邮箱!" });
             }
             else
@@ -206,9 +204,9 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidName(name))
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 logined.Name = name.Trim();
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Json(new { title = "修改成功", message = "成功修改姓名!" });
             }
             else
@@ -233,20 +231,20 @@ namespace WingStudio.Controllers
             {
                 return Json(new {status = "error", message = "上传图片不能为空!" });
             }
-            HttpPostedFileBase picture = Request.Files[0];
+            var picture = Request.Files[0];
             if (picture.ContentLength > 5242880)
             {
                 return Json(new { status = "error", message = "上传图片大小超出指定范围(5M)!" });
             }
-            string fileName = picture.FileName.Split('\\').Last();
+            var fileName = picture.FileName.Split('\\').Last();
             if(!fileName.Contains("."))
             {
                 return Json(new { status = "error", message = "上传图片格式不正确(.jpg/.png/.gif)!" });
             }
-            string fileExt = fileName.Substring(fileName.LastIndexOf('.')).ToLower();
+            var fileExt = fileName.Substring(fileName.LastIndexOf('.')).ToLower();
             if (fileExt == ".jpg" || fileExt == ".png" || fileExt == ".gif")
             {
-                string path = Server.MapPath("~/WingStudio/Avatar");
+                var path = Server.MapPath("~/WingStudio/Avatar");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -280,7 +278,7 @@ namespace WingStudio.Controllers
         {
             try
             {
-                string picPath = Server.MapPath(picture.imgUrl);
+                var picPath = Server.MapPath(picture.imgUrl);
                 if (System.IO.File.Exists(picPath))
                 {
                     var image = new WebImage(picPath);
@@ -289,9 +287,9 @@ namespace WingStudio.Controllers
                     image.Crop((int)picture.imgY1, (int)picture.imgX1, (int)(picture.imgH - picture.cropH - picture.imgY1), (int)(picture.imgW - picture.cropW - picture.imgX1));
                     image.Save(picPath);
 
-                    var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                    var logined = Loginer;
                     logined.Avatar = picPath.Split('\\').Last();
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Json(new { status = "success", url = $"/WingStudio/Avatar/{logined.Avatar}" });
                 }
                 else
@@ -299,7 +297,7 @@ namespace WingStudio.Controllers
                     return Json(new { status = "error", message = "剪切失败，找不到目标图片!" });
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(new { status = "error", message = "操作异常，图片剪切失败!" });
             }
@@ -315,8 +313,7 @@ namespace WingStudio.Controllers
         [HttpGet]
         public ActionResult InfoSetting()
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            return View(logined.UserInfo);
+            return View(Loginer.UserInfo);
         }
 
         /// <summary>
@@ -328,7 +325,7 @@ namespace WingStudio.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateInfo(UserInfo userInfo)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             //更新是否公开信息
             logined.UserInfo.PublicInfo = userInfo.PublicInfo;
 
@@ -465,7 +462,7 @@ namespace WingStudio.Controllers
                 logined.UserInfo.Introduction = "";
             }
 
-            entity.SaveChanges();
+            Entity.SaveChanges();
             return Content(WebHelper.SweetAlert("更新成功", "成功更新个人信息!", "location.href='/User/Index'"));
         }
 
@@ -477,7 +474,7 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult GetUserInfo(int id)
         {
-            var user = entity.Users.Find(id);
+            var user = Entity.Users.Find(id);
             if(user != null && user.UserInfo.PublicInfo)
             {
                 
@@ -515,8 +512,7 @@ namespace WingStudio.Controllers
         [HttpGet]
         public ActionResult ContactSetting()
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            return View(logined.UserInfo);
+            return View(Loginer.UserInfo);
         }
 
         /// <summary>
@@ -528,7 +524,7 @@ namespace WingStudio.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateContact(UserInfo contact)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
 
             logined.UserInfo.PublicContact = contact.PublicContact;
 
@@ -600,7 +596,7 @@ namespace WingStudio.Controllers
                 logined.UserInfo.Phone = "";
             }
 
-            entity.SaveChanges();
+            Entity.SaveChanges();
             return Content(WebHelper.SweetAlert("更新成功", "成功更新联系方式!", "location.href='/User/Index'"));
         }
 
@@ -612,7 +608,7 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult GetUserContact(int id)
         {
-            var user = entity.Users.Find(id);
+            var user = Entity.Users.Find(id);
             if (user != null && user.UserInfo.PublicContact)
             {
                 var userInfo = user.UserInfo;
@@ -646,34 +642,6 @@ namespace WingStudio.Controllers
             return View();
         }
 
-        #region 基本设置
-        /// <summary>
-        /// 更新基本设置
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult UpdateBaseConfig(UserConfig config)
-        {
-            return View();
-        }
-
-        #endregion
-
-        #region 其它设置
-        /// <summary>
-        /// 更新其他设置
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult UpdateOtherConfig(UserConfig config)
-        {
-            return View();
-        }
-
-        #endregion
-
         #endregion
 
         #region 博客
@@ -684,8 +652,8 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowBlog(int id)
         {
-            var blog = entity.Blogs.Find(id);
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var blog = Entity.Blogs.Find(id);
+            var logined = Loginer;
             if (blog == null)
             {
                 return View("Error");
@@ -695,18 +663,18 @@ namespace WingStudio.Controllers
                 //blog.LookCount++;
                 //entity.SaveChanges();
                 var blogs = logined.Blogs.Where(m => m.Type == blog.Type);
-                ViewBag.LastBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
-                ViewBag.NextBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.LastBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.NextBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault(); 
                 ViewBag.Logined = logined;
                 return View("ShowBlog", blog);
             }
             else if (blog.IsPublic)
             {
                 blog.LookCount++;
-                entity.SaveChanges();
-                var blogs = entity.Blogs.Where(m => m.Owner.Id == blog.Owner.Id && m.IsPublic);
-                ViewBag.LastBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
-                ViewBag.NextBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                Entity.SaveChanges();
+                var blogs = Entity.Blogs.Where(m => m.Owner.Id == blog.Owner.Id && m.IsPublic);
+                ViewBag.LastBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.NextBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
                 ViewBag.Logined = logined;
                 return View("ShowBlog", blog);
             }
@@ -719,23 +687,17 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 显示指定用户的已发布的博客
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult PublicUserBlogs(int? id, int? page)
         {
             var loginId = Convert.ToInt32(User.Identity.Name);
             var targetId = id ?? loginId;
-            var user = entity.Users.Find(targetId);
+            var user = Entity.Users.Find(targetId);
             if (user != null)
             {
-                if (targetId == loginId)
-                {
-                    ViewBag.Logined = user;
-                }
-                else
-                {
-                    ViewBag.Logined = entity.Users.Find(loginId);
-                }
+                ViewBag.Logined = targetId == loginId ? user : Entity.Users.Find(loginId);
                 ViewBag.UserId = targetId;
                 ViewBag.Title = user.Account + " - 个人博客";
                 var blogs = user.Blogs.Where(m => m.IsPublic).OrderByDescending(m => m.Id);
@@ -757,7 +719,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult SearchPublicBlog(string searchContent, int? page)
         {
-            ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            ViewBag.Logined = Loginer;
             ViewBag.Title = "搜索博客 - 所有博客";
             if (string.IsNullOrWhiteSpace(searchContent))
             {
@@ -767,7 +729,7 @@ namespace WingStudio.Controllers
             {
                
                 searchContent = searchContent.Trim();
-                var blogs = entity.Blogs.Where(m => m.IsPublic).Where(m => m.Theme.Contains(searchContent)).OrderByDescending(m => m.Id);
+                var blogs = Entity.Blogs.Where(m => m.IsPublic).Where(m => m.Theme.Contains(searchContent)).OrderByDescending(m => m.Id);
                 var pageNumber = page ?? 1;
 
                 var onePageOfProducts = blogs.ToPagedList(pageNumber, 10);
@@ -783,7 +745,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult BlogColumn(int? page)
         {
-            var groups = entity.BlogGroups.Where(m => (m.Accessible & Accessible.Inner) != 0).OrderByDescending(m => m.Id);
+            var groups = Entity.BlogGroups.Where(m => (m.Accessible & Accessible.Inner) != 0).OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             var onePageOfProducts = groups.ToPagedList(pageNumber, 12);
             return View(onePageOfProducts);
@@ -796,12 +758,12 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ColumnBlogs(int id, int? page)
         {
-            var blogGroup = entity.BlogGroups.Find(id);
+            var blogGroup = Entity.BlogGroups.Find(id);
             if (blogGroup != null && (blogGroup.Accessible & Accessible.Inner) != 0)
             {
                 ViewBag.GroupId = id;
                 ViewBag.Title = blogGroup.Theme + " - 博客专栏";
-                ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                ViewBag.Logined = Loginer;
 
                 var pageNumber = page ?? 1;
                 var onePageOfProducts = blogGroup.Blogs.OrderByDescending(m => m.Id).ToPagedList(pageNumber, 10);
@@ -820,8 +782,8 @@ namespace WingStudio.Controllers
         public ActionResult ColumnNewBlogs()
         {
             ViewBag.Title = "最新博客 - 博客专栏";
-            ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            var blogs = entity.Blogs.Where(m => m.IsPublic).OrderByDescending(m => m.PublicTime).ToPagedList(1, 10);
+            ViewBag.Logined = Loginer;
+            var blogs = Entity.Blogs.Where(m => m.IsPublic).OrderByDescending(m => m.PublicTime).ToPagedList(1, 10);
             return View("Blogs", blogs);
         }
         
@@ -833,8 +795,8 @@ namespace WingStudio.Controllers
         {
             var timeLimit = DateTime.Now.AddMonths(-1);
             ViewBag.Title = "最热博客 - 博客专栏";
-            ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            var blogs = entity.Blogs.Where(m => m.IsPublic && (m.PublicTime > timeLimit)).OrderByDescending(m => m.LookCount).ThenBy(m => m.Id).ToPagedList(1, 10);
+            ViewBag.Logined = Loginer;
+            var blogs = Entity.Blogs.Where(m => m.IsPublic && (m.PublicTime > timeLimit)).OrderByDescending(m => m.LookCount).ThenBy(m => m.Id).ToPagedList(1, 10);
             return View("Blogs", blogs);
         }
 
@@ -845,8 +807,8 @@ namespace WingStudio.Controllers
         public ActionResult ColumnPraiseBlogs()
         {
             ViewBag.Title = "强推博客 - 博客专栏";
-            ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            var blogs = entity.Blogs.Where(m => m.IsPublic).OrderByDescending(m => m.Recommendations.Count).ThenBy(m => m.LookCount).ToPagedList(1, 10);
+            ViewBag.Logined = Loginer;
+            var blogs = Entity.Blogs.Where(m => m.IsPublic).OrderByDescending(m => m.Recommendations.Count).ThenBy(m => m.LookCount).ToPagedList(1, 10);
             return View("Blogs", blogs);
         }
 
@@ -875,23 +837,23 @@ namespace WingStudio.Controllers
             ViewBag.BlogType = blogType;
 
             var id = Convert.ToInt32(User.Identity.Name);
-            var logined = entity.Users.Find(id);
+            var logined = Entity.Users.Find(id);
             ViewBag.PublicBlog = logined.UserConfig.PublicBlog;
             ViewBag.Account = logined.Account;
 
-            var blogs = entity.Blogs.Where(m => m.Owner.Id == id && m.Type == blogType).OrderByDescending(m => m.Id);
+            var blogs = Entity.Blogs.Where(m => m.Owner.Id == id && m.Type == blogType).OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             var onePageOfProducts = blogs.ToPagedList(pageNumber, 10);
             return View("ManageBlog", onePageOfProducts);
         }
-
+         
         /// <summary>
         /// 博客设置
         /// </summary>
         /// <returns></returns>
         public ActionResult BlogConfig()
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             ViewBag.Account = logined.Account;
             return View(logined.UserConfig);
         }
@@ -905,21 +867,14 @@ namespace WingStudio.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SaveBlogConfig(UserConfig config)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             var userConfig = logined.UserConfig;
             if(userConfig.PublicBlog != config.PublicBlog)
             {
                 userConfig.PublicBlog = config.PublicBlog;
             }
-            if(config.BlogEditor == BlogEditor.Baidu)
-            {
-                userConfig.BlogEditor = BlogEditor.Baidu;
-            }
-            else
-            {
-                userConfig.BlogEditor = BlogEditor.Markdown;
-            }
-            entity.SaveChanges();
+            userConfig.BlogEditor = config.BlogEditor == BlogEditor.Baidu ? BlogEditor.Baidu : BlogEditor.Markdown;
+            Entity.SaveChanges();
             return Content(WebHelper.SweetAlert("保存成功", "成功保存博客设置!"));
         }
 
@@ -929,10 +884,10 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ResetBlogConfig()
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             logined.UserConfig.PublicBlog = false;
             logined.UserConfig.BlogEditor = BlogEditor.Baidu;
-            entity.SaveChanges();
+            Entity.SaveChanges();
             return Content(WebHelper.SweetAlert("重置成功", "成功重置博客设置为默认!", "location.href='/User/BlogConfig'"));
         }
 
@@ -952,7 +907,7 @@ namespace WingStudio.Controllers
             ViewBag.BlogType = blogType;
 
             var id = Convert.ToInt32(User.Identity.Name);
-            var blogs = entity.Blogs.Where(m => m.Owner.Id == id && !m.IsPublic && m.Type == blogType).OrderByDescending(m => m.Id);
+            var blogs = Entity.Blogs.Where(m => m.Owner.Id == id && !m.IsPublic && m.Type == blogType).OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             var onePageOfProducts = blogs.ToPagedList(pageNumber, 10);
             return View("ManageBlog", onePageOfProducts);
@@ -965,7 +920,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult LoginUserBlogs(int? page, string type)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             ViewBag.Logined = logined;
             var pageNumber = page ?? 1;
             ViewBag.Type = "jotting";
@@ -1002,7 +957,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult DoneSaveBlog(int id)
         {
-            var blog = entity.Blogs.Find(id);
+            var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 ViewBag.PublicBlog = blog.Owner.UserConfig.PublicBlog;
@@ -1026,20 +981,20 @@ namespace WingStudio.Controllers
             {
                 return Json(new { success = 0, message = "上传图片不能为空!" });
             }
-            HttpPostedFileBase picture = Request.Files[0];
+            var picture = Request.Files[0];
             if (picture.ContentLength > 5242880)
             {
                 return Json(new { success = 0, message = "上传图片大小超出指定范围(5M)!" });
             }
-            string fileName = picture.FileName.Split('\\').Last();
+            var fileName = picture.FileName.Split('\\').Last();
             if (!fileName.Contains("."))
             {
                 return Json(new { success = 0, message = "上传图片格式不正确(.jpg/.png/.gif/.jpeg)!" });
             }
-            string fileExt = fileName.Substring(fileName.LastIndexOf('.')).ToLower();
+            var fileExt = fileName.Substring(fileName.LastIndexOf('.')).ToLower();
             if (fileExt == ".jpg" || fileExt == ".png" || fileExt == ".gif" || fileExt == ".jpeg")
             {
-                string path = Server.MapPath("~/WingStudio/MarkdownPicture");
+                var path = Server.MapPath("~/WingStudio/MarkdownPicture");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -1084,7 +1039,7 @@ namespace WingStudio.Controllers
         [HttpGet]
         public ActionResult AddBlog(string type)
         {
-            ViewBag.BlogEditor = entity.Users.Find(Convert.ToInt32(User.Identity.Name)).UserConfig.BlogEditor;
+            ViewBag.BlogEditor = Loginer.UserConfig.BlogEditor;
             ViewBag.IsModified = false;
             var blogType = BlogType.Jotting;
             if (type == "article")
@@ -1111,13 +1066,15 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidBlog(blog))
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-                var newBlog = new Blog();
-                newBlog.Owner = logined;
-                newBlog.Theme = blog.Theme.Trim();
-                newBlog.Content = blog.Content;
-                newBlog.Type = blog.Type;
-                newBlog.BlogEditor = logined.UserConfig.BlogEditor;
+                var logined = Loginer;
+                var newBlog = new Blog
+                {
+                    Owner = logined,
+                    Theme = blog.Theme.Trim(),
+                    Content = blog.Content,
+                    Type = blog.Type,
+                    BlogEditor = logined.UserConfig.BlogEditor
+                };
                 if (blog.Type == BlogType.Diary)
                 {
                     newBlog.IsPublic = false;
@@ -1134,31 +1091,32 @@ namespace WingStudio.Controllers
                 if (!string.IsNullOrWhiteSpace(blog.Tag))
                 {
                     var str = "";
-                    var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
-                    var count = subStrs.Count() < 10 ? subStrs.Count() : 10;
-                    for (int i = 0; i < count - 1; i++)
+                    var subStrs = blog.Tag.ToLower().Split(new [] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
+                    var enumerable = subStrs as string[] ?? subStrs.ToArray();
+                    var count = enumerable.Length < 10 ? enumerable.Length : 10;
+                    for (var i = 0; i < count - 1; i++)
                     {
-                        if (subStrs.ElementAt(i).Length < 51)
+                        if (enumerable.ElementAt(i).Length < 51)
                         {
-                            str += subStrs.ElementAt(i) + ",";
+                            str += enumerable.ElementAt(i) + ",";
                         }
                         else
                         {
-                            str += subStrs.ElementAt(i).Substring(0, 50) + ",";
+                            str += enumerable.ElementAt(i).Substring(0, 50) + ",";
                         }
                     }
-                    if (subStrs.ElementAt(count - 1).Length < 51)
+                    if (enumerable.ElementAt(count - 1).Length < 51)
                     {
-                        str += subStrs.ElementAt(count - 1);
+                        str += enumerable.ElementAt(count - 1);
                     }
                     else
                     {
-                        str += subStrs.ElementAt(count - 1).Substring(0, 50);
+                        str += enumerable.ElementAt(count - 1).Substring(0, 50);
                     }
                     newBlog.Tag = str;
                 }
-                entity.Blogs.Add(newBlog);
-                entity.SaveChanges();
+                Entity.Blogs.Add(newBlog);
+                Entity.SaveChanges();
                 return RedirectToAction("DoneSaveBlog", new { id = newBlog.Id });
             }
             else
@@ -1167,70 +1125,81 @@ namespace WingStudio.Controllers
             }
         }
 
-        /// <summary>
-        /// 直接添加博客到榜中
-        /// </summary>
-        /// <param name="blog"></param>
-        /// <returns></returns>
-        [HttpPost]
-
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddBlogToTopList(Blog blog)
-        {
-            if (WebSecurity.IsValidBlog(blog))
-            {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-                string tag = "";
-                if (!string.IsNullOrWhiteSpace(blog.Tag))
-                {
-                    var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
-                    var count = subStrs.Count() < 10 ? subStrs.Count() : 10;
-                    for (int i = 0; i < count - 1; i++)
-                    {
-                        if (subStrs.ElementAt(i).Length < 51)
-                        {
-                            tag += subStrs.ElementAt(i) + ",";
-                        }
-                        else
-                        {
-                            tag += subStrs.ElementAt(i).Substring(0, 50) + ",";
-                        }
-                    }
-                    if (subStrs.ElementAt(count - 1).Length < 51)
-                    {
-                        tag += subStrs.ElementAt(count - 1);
-                    }
-                    else
-                    {
-                        tag += subStrs.ElementAt(count - 1).Substring(0, 50);
-                    }
-                }
-                Dictionary<string, string> requstData = new Dictionary<string, string> {
-                    {"Tag", tag },
-                    {"Owner_Id", logined.Id.ToString() },
-                    {"Content", blog.Content },
-                    {"Theme",  blog.Theme.Trim() },
-                    {"Type", ((int)BlogType.Jotting).ToString() },
-                    {"BlogEditor", ((int)logined.UserConfig.BlogEditor).ToString() },
-                    {"Account", logined.Account },
-                    {"Password", logined.Password },
-                };
-                string result = await WebHelper.HttpRequest("http://119.29.209.102:8080/appserver/addToBlogTop", requstData);
-                if (result == "1")
-                {
-                    return Content(WebHelper.SweetAlert("入榜成功", "博客成功入榜，可在手机App上查看，待到放榜之时就是它回归之日!", "location.href='/User/ManageBlog'"));
-                }
-                else
-                {
-                    return Content(WebHelper.SweetAlert("入榜失败", $"可能由于网络原因或访问受限，请求发送失败，请刷新重试!"));
-                }
-                
-            }
-            else
-            {
-                return Content(WebHelper.SweetAlert("入榜失败", "提交的信息不合法!"));
-            }
-        }
+        ///// <summary>
+        ///// 直接添加博客到榜中
+        ///// </summary>
+        ///// <param name="blog"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> AddBlogToTopList(Blog blog)
+        //{
+        //    if (WebSecurity.IsValidBlog(blog))
+        //    {
+        //        var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+        //        var tag = "";
+        //        if (!string.IsNullOrWhiteSpace(blog.Tag))
+        //        {
+        //            var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
+        //            var arr = subStrs as string[] ?? subStrs.ToArray();
+        //            var count = arr.Count() < 10 ? arr.Count() : 10;
+        //            for (var i = 0; i < count - 1; i++)
+        //            {
+        //                if (arr.ElementAt(i).Length < 51)
+        //                {
+        //                    tag += arr.ElementAt(i) + ",";
+        //                }
+        //                else
+        //                {
+        //                    tag += arr.ElementAt(i).Substring(0, 50) + ",";
+        //                }
+        //            }
+        //            if (arr.ElementAt(count - 1).Length < 51)
+        //            {
+        //                tag += arr.ElementAt(count - 1);
+        //            }
+        //            else
+        //            {
+        //                tag += arr.ElementAt(count - 1).Substring(0, 50);
+        //            }
+        //        }
+        //        var requstData = new Dictionary<string, string> {
+        //            {"Tag", tag },
+        //            {"Owner_Id", logined.Id.ToString() },
+        //            {"Content", blog.Content },
+        //            {"Theme",  blog.Theme.Trim() },
+        //            {"Type", ((int)BlogType.Jotting).ToString() },
+        //            {"BlogEditor", ((int)logined.UserConfig.BlogEditor).ToString() },
+        //            {"Account", logined.Account },
+        //            {"Password", logined.Password },
+        //        };
+        //        var result = await WebHelper.HttpRequest("http://119.29.209.102:8080/appserver/addToBlogTop", requstData);
+        //        if (result == "1")
+        //        {
+        //            return Content(WebHelper.SweetAlert("入榜成功", "博客成功入榜，可在手机App上查看，待到放榜之时就是它回归之日!", "location.href='/User/ManageBlog'"));
+        //        }
+        //        else
+        //        {
+        //            var newBlog = new Blog
+        //            {
+        //                Owner = logined,
+        //                Theme = blog.Theme.Trim(),
+        //                Content = blog.Content,
+        //                Type = blog.Type,
+        //                BlogEditor = logined.UserConfig.BlogEditor,
+        //                IsPublic = false,
+        //                Tag = tag,
+        //            };
+        //            entity.Blogs.Add(newBlog);
+        //            entity.SaveChanges();
+        //            return Content(WebHelper.SweetAlert("入榜失败", $"可能由于网络原因或访问受限，请求发送失败，请刷新重试!"));
+        //        } 
+        //    }
+        //    else
+        //    {
+        //        return Content(WebHelper.SweetAlert("入榜失败", "提交的信息不合法!"));
+        //    }
+        //}
 
         /// <summary>
         /// 修改博客
@@ -1240,7 +1209,7 @@ namespace WingStudio.Controllers
         [HttpGet]
         public ActionResult ModBlog(int id)
         {
-            var blog = entity.Blogs.Find(id);
+            var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 ViewBag.BlogEditor = blog.BlogEditor;
@@ -1265,10 +1234,8 @@ namespace WingStudio.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ModBlog(int id, Blog blog)
         {
-            
-
-            var targetBlog = entity.Blogs.Find(id);
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var targetBlog = Entity.Blogs.Find(id);
+            var logined = Loginer;
             if (targetBlog != null && targetBlog.Owner.Id == logined.Id && WebSecurity.IsValidBlog(blog))
             {
                 targetBlog.Owner = logined;
@@ -1288,7 +1255,7 @@ namespace WingStudio.Controllers
                     var str = "";
                     var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
                     var count = subStrs.Count() < 10 ? subStrs.Count() : 10;
-                    for (int i = 0; i < count - 1; i++)
+                    for (var i = 0; i < count - 1; i++)
                     {
                         if (subStrs.ElementAt(i).Length < 51)
                         {
@@ -1310,7 +1277,7 @@ namespace WingStudio.Controllers
                     targetBlog.Tag = str;
                 }
 
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return RedirectToAction("DoneSaveBlog", new { id });
             }
             else
@@ -1319,74 +1286,73 @@ namespace WingStudio.Controllers
             }
         }
 
-        /// <summary>
-        /// 修改博客草稿到榜中
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="blog"></param>
-        /// <returns></returns>
-        [HttpPost]
-
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ModBlogToTopList(int id, Blog blog)
-        {
-            var targetBlog = entity.Blogs.Find(id);
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-            if (targetBlog != null && targetBlog.Owner.Id == logined.Id && targetBlog.Type == BlogType.Jotting && !targetBlog.IsPublic && WebSecurity.IsValidBlog(blog))
-            {
-                var tag = "";
-                if (!string.IsNullOrWhiteSpace(blog.Tag))
-                {
-                    var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
-                    var count = subStrs.Count() < 10 ? subStrs.Count() : 10;
-                    for (int i = 0; i < count - 1; i++)
-                    {
-                        if (subStrs.ElementAt(i).Length < 51)
-                        {
-                            tag += subStrs.ElementAt(i) + ",";
-                        }
-                        else
-                        {
-                            tag += subStrs.ElementAt(i).Substring(0, 50) + ",";
-                        }
-                    }
-                    if (subStrs.ElementAt(count - 1).Length < 51)
-                    {
-                        tag += subStrs.ElementAt(count - 1);
-                    }
-                    else
-                    {
-                        tag += subStrs.ElementAt(count - 1).Substring(0, 50);
-                    }
-                }
-                entity.Blogs.Remove(targetBlog);
-                entity.SaveChanges();
-
-                Dictionary<string, string> requstData = new Dictionary<string, string> {
-                    {"Tag", tag },
-                    {"Owner_Id", logined.Id.ToString() },
-                    {"Content", blog.Content },
-                    {"Theme",  blog.Theme.Trim() },
-                    {"Type", ((int)BlogType.Jotting).ToString() },
-                    {"BlogEditor", ((int)logined.UserConfig.BlogEditor).ToString() },
-                    {"Account", logined.Account },
-                    {"Password", logined.Password },
-                };
-                string result = await WebHelper.HttpRequest("http://119.29.209.102:8080/appserver/addToBlogTop", requstData);
-                if (result == "1")
-                {
-                    return Content(WebHelper.SweetAlert("入榜成功", "博客成功入榜，可在手机App上查看，待到放榜之时就是它回归之日!", "location.href='/User/ManageBlog'"));
-                }
-                else
-                {
-                    return Content(WebHelper.SweetAlert("入榜失败", $"可能由于网络原因或访问受限，请求发送失败，请刷新重试!"));
-                }
-            }
-            else
-            {
-                return Content(WebHelper.SweetAlert("入榜失败", "提交的信息不合法!"));
-            }
-        }
+        ///// <summary>
+        ///// 修改博客草稿到榜中
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="blog"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> ModBlogToTopList(int id, Blog blog)
+        //{
+        //    var targetBlog = entity.Blogs.Find(id);
+        //    var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+        //    if (targetBlog != null && targetBlog.Owner.Id == logined.Id && targetBlog.Type == BlogType.Jotting && !targetBlog.IsPublic && WebSecurity.IsValidBlog(blog))
+        //    {
+        //        var tag = "";
+        //        if (!string.IsNullOrWhiteSpace(blog.Tag))
+        //        {
+        //            var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
+        //            var arr = subStrs as string[] ?? subStrs.ToArray();
+        //            var count = arr.Count() < 10 ? arr.Count() : 10;
+        //            for (var i = 0; i < count - 1; i++)
+        //            {
+        //                if (arr.ElementAt(i).Length < 51)
+        //                {
+        //                    tag += arr.ElementAt(i) + ",";
+        //                }
+        //                else
+        //                {
+        //                    tag += arr.ElementAt(i).Substring(0, 50) + ",";
+        //                }
+        //            }
+        //            if (arr.ElementAt(count - 1).Length < 51)
+        //            {
+        //                tag += arr.ElementAt(count - 1);
+        //            }
+        //            else
+        //            {
+        //                tag += arr.ElementAt(count - 1).Substring(0, 50);
+        //            }
+        //        }
+        //        var requstData = new Dictionary<string, string> {
+        //            {"Tag", tag },
+        //            {"Owner_Id", logined.Id.ToString() },
+        //            {"Content", blog.Content },
+        //            {"Theme",  blog.Theme.Trim() },
+        //            {"Type", ((int)BlogType.Jotting).ToString() },
+        //            {"BlogEditor", ((int)logined.UserConfig.BlogEditor).ToString() },
+        //            {"Account", logined.Account },
+        //            {"Password", logined.Password },
+        //        };
+        //        var result = await WebHelper.HttpRequest("http://119.29.209.102:8080/appserver/addToBlogTop", requstData);
+        //        if (result == "1")
+        //        {
+        //            entity.Blogs.Remove(targetBlog);
+        //            entity.SaveChanges();
+        //            return Content(WebHelper.SweetAlert("入榜成功", "博客成功入榜，可在手机App上查看，待到放榜之时就是它回归之日!", "location.href='/User/ManageBlog'"));
+        //        }
+        //        else
+        //        {
+        //            return Content(WebHelper.SweetAlert("入榜失败", $"可能由于网络原因或访问受限，请求发送失败，请刷新重试!"));
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Content(WebHelper.SweetAlert("入榜失败", "提交的信息不合法!"));
+        //    }
+        //}
 
         /// <summary>
         /// 删除博客
@@ -1395,7 +1361,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult DelBlog(int id)
         {
-            var blog = entity.Blogs.Find(id);
+            var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 var typeText = "";
@@ -1411,8 +1377,8 @@ namespace WingStudio.Controllers
                 {
                     typeText = "日记";
                 }
-                entity.Blogs.Remove(blog);
-                entity.SaveChanges();
+                Entity.Blogs.Remove(blog);
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("删除成功", $"成功删除这篇{typeText}!"));
             }
             else
@@ -1429,7 +1395,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult SearchLoginUserBlog(string searchContent, int? page)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             ViewBag.Logined = logined;
             ViewBag.Title = "搜索 - 个人博客";
             if (string.IsNullOrWhiteSpace(searchContent))
@@ -1456,7 +1422,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult SearchTagBlog(string searchContent, int? page)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             ViewBag.Logined = logined;
             ViewBag.Title = "标签搜索 - 个人博客";
             if (string.IsNullOrWhiteSpace(searchContent))
@@ -1486,7 +1452,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Favorites(int? page)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             ViewBag.PublicBlog = logined.UserConfig.PublicBlog;
             ViewBag.Account = logined.Account;
 
@@ -1504,10 +1470,10 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult AddBlogToFavorites(int id)
         {
-            var blog = entity.Blogs.Find(id);
+            var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.IsPublic)
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 if(logined.Favorites.Blogs.Count(m => m.Id == id) > 0)
                 {
                     return Content(WebHelper.SweetAlert("温馨提示", "你已经已收藏了该博客!"));
@@ -1515,7 +1481,7 @@ namespace WingStudio.Controllers
                 else
                 {
                     logined.Favorites.Blogs.Add(blog);
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("收藏成功", "成功收藏该博客!"));
                 }
             }
@@ -1532,12 +1498,12 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult DelBlogToFavorites(int id)
         {
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var logined = Loginer;
             var blog = logined.Favorites.Blogs.SingleOrDefault(m => m.Id == id);
             if (blog != null)
             {
                 logined.Favorites.Blogs.Remove(blog);
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("删除成功", "成功从收藏夹中删除博客!"));
             }
             else
@@ -1556,10 +1522,10 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult AddBlogToRecommendations(int id)
         {
-            var blog = entity.Blogs.Find(id);
+            var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.IsPublic)
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 if(blog.Owner.Id != logined.Id)
                 {
                     if(logined.Recommendations.Blogs.Count(m => m.Id == id) >  0)
@@ -1569,7 +1535,7 @@ namespace WingStudio.Controllers
                     else
                     {
                         logined.Recommendations.Blogs.Add(blog);
-                        entity.SaveChanges();
+                        Entity.SaveChanges();
                         return Content(WebHelper.SweetAlert("推荐成功", "成功推荐该博客!"));
                     }
                 }
@@ -1599,7 +1565,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ResourceColumn(int? page)
         {
-            var groups = entity.FileGroups.Where(m => (m.Accessible & Accessible.Inner) != 0);
+            var groups = Entity.FileGroups.Where(m => (m.Accessible & Accessible.Inner) != 0);
             var pageNumber = page ?? 1;
             var onePageOfProducts = groups.ToPagedList(pageNumber, 10);
             return View(onePageOfProducts);
@@ -1612,7 +1578,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ColumnResources(int id, int? page)
         {
-            var fileGroup = entity.FileGroups.Find(id);
+            var fileGroup = Entity.FileGroups.Find(id);
             if (fileGroup != null && (fileGroup.Accessible & Accessible.Inner) != 0)
             {
                 return View(fileGroup);
@@ -1631,7 +1597,7 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult LookColumnDocument(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Type == FileType.Document && file.Groups.Count(m => (m.Accessible & Accessible.Inner) != 0) > 0)
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
@@ -1639,7 +1605,7 @@ namespace WingStudio.Controllers
                 {
 
                     file.LookCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     //.doc(x)、.txt、.xls(x)、.ppt(x)、.pdf
 
@@ -1648,8 +1614,8 @@ namespace WingStudio.Controllers
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -1667,21 +1633,21 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult LoadColumnResource(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Groups.Count(m => (m.Accessible & Accessible.Inner) != 0) > 0)
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
                 if (System.IO.File.Exists(path))
                 {
                     file.LoadCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return File(path, "application/octet-stream", Url.Encode(file.Name));
                 }
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -1699,14 +1665,14 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult PlayColumnVideo(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Type == FileType.Video && file.Groups.Count(m => (m.Accessible & Accessible.Inner) != 0) > 0)
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
                 if (System.IO.File.Exists(path))
                 {
                     file.LookCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     ViewBag.FileName = file.Name;
                     ViewBag.TargetSource = file.FilePath;
                     return View("PlayVideo");
@@ -1714,8 +1680,8 @@ namespace WingStudio.Controllers
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -1741,7 +1707,7 @@ namespace WingStudio.Controllers
             else
             {
                 searchContent = searchContent.Trim();
-                var files = entity.WebFiles.Where(m => m.Groups.Count(g => (g.Accessible & Accessible.Inner) != 0) > 0).Where(m => m.Name.Contains(searchContent)).OrderByDescending(m => m.Id);
+                var files = Entity.WebFiles.Where(m => m.Groups.Count(g => (g.Accessible & Accessible.Inner) != 0) > 0).Where(m => m.Name.Contains(searchContent)).OrderByDescending(m => m.Id);
                 var pageNumber = page ?? 1;
                 ViewBag.PageNumber = pageNumber;
                 var onePageOfProducts = files.ToPagedList(pageNumber, 10);
@@ -1783,7 +1749,7 @@ namespace WingStudio.Controllers
             ViewBag.FileType = fileType;
 
             var loginId = Convert.ToInt32(User.Identity.Name);
-            var folders = entity.WebFolders.Where(m => m.Owner.Id == loginId && m.ParentFolder == null);
+            var folders = Entity.WebFolders.Where(m => m.Owner.Id == loginId && m.ParentFolder == null);
             return View(folders);
         }
 
@@ -1794,7 +1760,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Resources(int id)
         {
-            var folder = entity.WebFolders.Find(id);
+            var folder = Entity.WebFolders.Find(id);
             if (folder != null && folder.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 return View(folder);
@@ -1814,14 +1780,14 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult AddFile(int id, HttpPostedFileBase file)
         {
-            var folder = entity.WebFolders.Find(id);
+            var folder = Entity.WebFolders.Find(id);
             var loginId = Convert.ToInt32(User.Identity.Name);
             if (folder != null && folder.Owner.Id == loginId)
             {
                 if (file != null && file.ContentLength > 0)
                 {
-                    int fileSize = file.ContentLength;
-                    if (WebSecurity.UploadOverLimit(fileSize, entity.WebFiles.Where(m => m.Owner.Id == loginId).ToList()))
+                    var fileSize = file.ContentLength;
+                    if (WebSecurity.UploadOverLimit(fileSize, Entity.WebFiles.Where(m => m.Owner.Id == loginId).ToList()))
                     {
                         return Json(new { title = "上传失败", message = "所要上传的资源操过了资源容量上限(1G)，可选择删除部分已上传资源!" });
                     }
@@ -1829,7 +1795,7 @@ namespace WingStudio.Controllers
                     if (fileSize <= 104857600)
                     {
 
-                        string fileName = file.FileName.Split('\\').Last();
+                        var fileName = file.FileName.Split('\\').Last();
                         string fileExt = "", name = fileName;
                         if (fileName.LastIndexOf('.') > -1)
                         {
@@ -1841,7 +1807,7 @@ namespace WingStudio.Controllers
                             return Json(new { title = "上传失败", message = "文件的后缀名不合法!" });
                         }
 
-                        string path = Server.MapPath("~/WingStudio/Resource");
+                        var path = Server.MapPath("~/WingStudio/Resource");
                         if (!Directory.Exists(path))
                         {
                             Directory.CreateDirectory(path);
@@ -1849,15 +1815,17 @@ namespace WingStudio.Controllers
                         fileName = DateTime.Now.ToFileTime().ToString() + Guid.NewGuid().ToString("N") + fileExt;
                         file.SaveAs(Path.Combine(path, fileName));//从客户端保存文件到本地
 
-                        var newFile = new WebFile();
-                        newFile.Owner = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-                        newFile.Name = name;
-                        newFile.FilePath = fileName;
-                        newFile.FileSize = fileSize;
-                        newFile.Type = folder.Type;
+                        var newFile = new WebFile
+                        {
+                            Owner = Loginer,
+                            Name = name,
+                            FilePath = fileName,
+                            FileSize = fileSize,
+                            Type = folder.Type
+                        };
 
                         folder.SubFiles.Add(newFile);
-                        entity.SaveChanges();
+                        Entity.SaveChanges();
                         return Json(new { title = "添加成功", message = "成功添加文件!" });
                     }
                     else
@@ -1885,19 +1853,21 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult AddFolder(int id, string name)
         {
-            var folder = entity.WebFolders.Find(id);
-            var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+            var folder = Entity.WebFolders.Find(id);
+            var logined = Loginer;
             if (folder != null && folder.Owner.Id == logined.Id)
             {
                 if (!string.IsNullOrWhiteSpace(name) && name.Length < 21)
                 {
-                    var newFolder = new WebFolder();
-                    newFolder.Owner = logined;
-                    newFolder.Name = name;
-                    newFolder.Type = folder.Type;
+                    var newFolder = new WebFolder
+                    {
+                        Owner = logined,
+                        Name = name,
+                        Type = folder.Type
+                    };
 
                     folder.SubFolders.Add(newFolder);
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     return Content(WebHelper.SweetAlert("添加成功", "成功添加文件夹!"));
                 }
@@ -1921,14 +1891,14 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult ModFile(int id, string newName)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 if (!string.IsNullOrWhiteSpace(newName) && newName.Length < 21)
                 {
                     file.Name = newName;
                     file.LastModTime = DateTime.Now;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     return Content(WebHelper.SweetAlert("修改成功", "成功重命名文件!"));
                 }
@@ -1952,14 +1922,14 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult ModFolder(int id, string newName)
         {
-            var folder = entity.WebFolders.Find(id);
+            var folder = Entity.WebFolders.Find(id);
             if (folder != null && folder.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 if (!string.IsNullOrWhiteSpace(newName) && newName.Length < 21)
                 {
                     folder.Name = newName;
                     folder.LastModTime = DateTime.Now;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     return Content(WebHelper.SweetAlert("修改成功", "成功重命名文件夹!"));
                 }
@@ -1982,12 +1952,12 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult DelFile(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 //file.Groups.Clear();
-                entity.WebFiles.Remove(file);
-                entity.SaveChanges();
+                Entity.WebFiles.Remove(file);
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("删除成功", "成功删除文件!"));
             }
             else
@@ -2004,11 +1974,11 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult DelFolder(int id)
         {
-            var folder = entity.WebFolders.Find(id);
+            var folder = Entity.WebFolders.Find(id);
             if (folder != null && folder.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 DelFolder(folder);
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("删除成功", "成功删除文件夹!"));
             }
             else
@@ -2023,12 +1993,12 @@ namespace WingStudio.Controllers
         /// <param name="folder"></param>
         private void DelFolder(WebFolder folder)
         {
-            entity.WebFiles.RemoveRange(folder.SubFiles);
+            Entity.WebFiles.RemoveRange(folder.SubFiles);
             foreach (var item in folder.SubFolders)
             {
                 DelFolder(item);
             }
-            entity.WebFolders.Remove(folder);
+            Entity.WebFolders.Remove(folder);
         }
 
         /// <summary>
@@ -2040,8 +2010,8 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult CopyFileTo(int id, int targetId)
         {
-            var file = entity.WebFiles.Find(id);
-            var folder = entity.WebFolders.Find(targetId);
+            var file = Entity.WebFiles.Find(id);
+            var folder = Entity.WebFolders.Find(targetId);
             if (file != null && folder != null && file.Owner.Id == Convert.ToInt32(User.Identity.Name) && folder.Owner.Id == Convert.ToInt32(User.Identity.Name) && file.Type == folder.Type)
             {
                 if (file.ParentFolder.Id == folder.Id)
@@ -2052,7 +2022,7 @@ namespace WingStudio.Controllers
                 {
                     var newFile = (WebFile)file.Clone();
                     folder.SubFiles.Add(newFile);
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     return Content(WebHelper.SweetAlert("复制成功", "成功复制文件到指定文件夹!"));
                 }
@@ -2072,9 +2042,9 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult CopyFolderTo(int id, int targetId)
         {
-            var folder = entity.WebFolders.Find(id);
-            var targetFolder = entity.WebFolders.Find(targetId);
-            if (folder != null && folder.ParentFolder != null && targetFolder != null && targetFolder.Owner.Id == Convert.ToInt32(User.Identity.Name) && folder.Owner.Id == Convert.ToInt32(User.Identity.Name) && targetFolder.Type == folder.Type)
+            var folder = Entity.WebFolders.Find(id);
+            var targetFolder = Entity.WebFolders.Find(targetId);
+            if (folder?.ParentFolder != null && targetFolder != null && targetFolder.Owner.Id == Convert.ToInt32(User.Identity.Name) && folder.Owner.Id == Convert.ToInt32(User.Identity.Name) && targetFolder.Type == folder.Type)
             {
                 if (folder.ParentFolder.Id == targetId)
                 {
@@ -2097,7 +2067,7 @@ namespace WingStudio.Controllers
 
                     var newFolder = (WebFolder)folder.Clone();
                     targetFolder.SubFolders.Add(newFolder);
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("复制成功", "成功复制文件夹到指定文件夹!"));
                 }
             }
@@ -2116,8 +2086,8 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult MoveFileTo(int id, int targetId)
         {
-            var file = entity.WebFiles.Find(id);
-            var folder = entity.WebFolders.Find(targetId);
+            var file = Entity.WebFiles.Find(id);
+            var folder = Entity.WebFolders.Find(targetId);
             if (file != null && folder != null && file.Owner.Id == Convert.ToInt32(User.Identity.Name) && folder.Owner.Id == Convert.ToInt32(User.Identity.Name) && file.Type == folder.Type)
             {
                 if (file.ParentFolder.Id == targetId)
@@ -2129,7 +2099,7 @@ namespace WingStudio.Controllers
                     file.LastModTime = DateTime.Now;
                     folder.SubFiles.Add(file);
 
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     return Content(WebHelper.SweetAlert("移动成功", "成功移动文件到指定文件夹!"));
                 }
@@ -2149,9 +2119,9 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult MoveFolderTo(int id, int targetId)
         {
-            var folder = entity.WebFolders.Find(id);
-            var targetFolder = entity.WebFolders.Find(targetId);
-            if (folder != null && folder.ParentFolder != null && targetFolder != null && targetFolder.Owner.Id == Convert.ToInt32(User.Identity.Name) && folder.Owner.Id == Convert.ToInt32(User.Identity.Name) && targetFolder.Type == folder.Type)
+            var folder = Entity.WebFolders.Find(id);
+            var targetFolder = Entity.WebFolders.Find(targetId);
+            if (folder?.ParentFolder != null && targetFolder != null && targetFolder.Owner.Id == Convert.ToInt32(User.Identity.Name) && folder.Owner.Id == Convert.ToInt32(User.Identity.Name) && targetFolder.Type == folder.Type)
             {
                 if (folder.ParentFolder.Id == targetId)
                 {
@@ -2175,7 +2145,7 @@ namespace WingStudio.Controllers
                     folder.LastModTime = DateTime.Now;
                     targetFolder.SubFolders.Add(folder);
 
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("移动成功", "成功移动文件夹到指定文件夹!"));
                 }
             }
@@ -2192,7 +2162,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult LookDocument(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Type == FileType.Document && file.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
@@ -2200,7 +2170,7 @@ namespace WingStudio.Controllers
                 {
 
                     file.LookCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     //.doc(x)、.txt、.xls(x)、.ppt(x)、.pdf
 
@@ -2209,8 +2179,8 @@ namespace WingStudio.Controllers
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -2227,21 +2197,21 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult LoadResource(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
                 if (System.IO.File.Exists(path))
                 {
                     file.LoadCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return File(path, "application/octet-stream", Url.Encode(file.Name));
                 }
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -2258,14 +2228,14 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult PlayVideo(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Type == FileType.Video && file.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
                 if (System.IO.File.Exists(path))
                 {
                     file.LookCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     ViewBag.FileName = file.Name;
                     ViewBag.TargetSource = file.FilePath;
                     return View("PlayVideo");
@@ -2273,8 +2243,8 @@ namespace WingStudio.Controllers
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -2300,12 +2270,12 @@ namespace WingStudio.Controllers
 
             ViewBag.Read = true;
             var id = Convert.ToInt32(User.Identity.Name);
-            var msgs = from msg in entity.Messages
-                       join packet in entity.Packets
+            var msgs = from msg in Entity.Messages
+                       join packet in Entity.Packets
                        on msg.Id equals packet.Message.Id
                        where packet.TargetId == id && !packet.Deleted && packet.Read
                        select msg;
-            ViewBag.ReadingMsgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
+            ViewBag.ReadingMsgCount = Entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
             var pageNumber = page ?? 1;
             ViewBag.PageNumber = pageNumber;
             var onePageOfProducts = msgs.OrderByDescending(m => m.Id).ToPagedList(pageNumber, 10);
@@ -2321,13 +2291,13 @@ namespace WingStudio.Controllers
         {
             ViewBag.Read = false;
             var id = Convert.ToInt32(User.Identity.Name);
-            var msgs = from msg in entity.Messages
-                       join packet in entity.Packets
+            var msgs = from msg in Entity.Messages
+                       join packet in Entity.Packets
                        on msg.Id equals packet.Message.Id
                        where packet.TargetId == id && !packet.Deleted && !packet.Read
                        select msg;
 
-            int msgCount = msgs.Count();
+            var msgCount = msgs.Count();
             if (msgCount > 0)
             {
                 ViewBag.ReadingMsgCount = msgCount;
@@ -2349,7 +2319,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult LookMessage(int id)
         {
-            var msg = entity.Messages.Find(id);
+            var msg = Entity.Messages.Find(id);
             if (msg != null)
             {
                 var state = msg.Packets.SingleOrDefault(m => m.TargetId == Convert.ToInt32(User.Identity.Name));
@@ -2358,7 +2328,7 @@ namespace WingStudio.Controllers
                     if (!state.Read)
                     {
                         state.Read = true;
-                        entity.SaveChanges();
+                        Entity.SaveChanges();
                     }
                     ViewBag.Owner = "管理员";
                     return View(msg);
@@ -2381,7 +2351,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult HadRead(int id, int? page)
         {
-            var msg = entity.Messages.Find(id);
+            var msg = Entity.Messages.Find(id);
             if (msg != null)
             {
                 var loginId = Convert.ToInt32(User.Identity.Name);
@@ -2389,8 +2359,8 @@ namespace WingStudio.Controllers
                 if (state != null && !state.Deleted && !state.Read)
                 {
                     state.Read = true;
-                    entity.SaveChanges();
-                    var msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == loginId) > 0);
+                    Entity.SaveChanges();
+                    var msgCount = Entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == loginId) > 0);
                     if (msgCount > 0)
                     {
                         return RedirectToAction("ReadingMsg", new { page = page ?? 1 });
@@ -2418,14 +2388,14 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult DelMessage(int id)
         {
-            var msg = entity.Messages.Find(id);
+            var msg = Entity.Messages.Find(id);
             if (msg != null)
             {
                 var state = msg.Packets.SingleOrDefault(m => m.TargetId == Convert.ToInt32(User.Identity.Name));
                 if (state != null && !state.Deleted)
                 {
                     state.Deleted = true;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("删除成功", "成功删除信息!"));
                 }
                 else
@@ -2447,7 +2417,7 @@ namespace WingStudio.Controllers
         public ActionResult SendMessage()
         {
             var id = Convert.ToInt32(User.Identity.Name);
-            ViewBag.ReadingMsgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
+            ViewBag.ReadingMsgCount = Entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
             return View("SaveMessage");
         }
 
@@ -2464,17 +2434,18 @@ namespace WingStudio.Controllers
         {
             if (msg != null && WebSecurity.IsValidMessage(msg))
             {
-                var logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
-                Message newMsg = new Message();
-                newMsg.Content = msg.Content;
-                newMsg.Theme = msg.Theme.Trim();
-                newMsg.OwnId = logined.Id;
-                newMsg.Packets = new HashSet<Packet>();
-                var packet = new Packet();
-                packet.TargetId = 0;
+                var logined = Loginer;
+                var newMsg = new Message
+                {
+                    Content = msg.Content,
+                    Theme = msg.Theme.Trim(),
+                    OwnId = logined.Id,
+                    Packets = new HashSet<Packet>()
+                };
+                var packet = new Packet {TargetId = 0};
                 newMsg.Packets.Add(packet);
-                entity.Messages.Add(newMsg);
-                entity.SaveChanges();
+                Entity.Messages.Add(newMsg);
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("发送成功", "成功发送反馈信息!", "location.href='/User/ManageReceivedMsg'"));
             }
             else

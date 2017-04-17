@@ -1,6 +1,4 @@
-﻿@using WingStudio.Models;
-@using PagedList.Mvc;
-@using PagedList;
+﻿@using PagedList.Mvc;
 @model IPagedList<WingStudio.Models.Blog>
 
 @{
@@ -40,8 +38,8 @@
                     <tbody>
                         @{
                             int page = ViewBag.PageNumber;
-                            int i = (page - 1) * 10;
-                            Dictionary<BlogType, string> dic = new Dictionary<BlogType, string> {
+                            var i = (page - 1) * 10;
+                            var dic = new Dictionary<BlogType, string> {
                                 {BlogType.Jotting,"随笔"},
                                 {BlogType.Article,"文章"},
                                 {BlogType.Diary,"日记"},

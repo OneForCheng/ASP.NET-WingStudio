@@ -1,10 +1,7 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 
 /// <summary>
 /// PathFormater 的摘要说明
@@ -21,8 +18,8 @@ public static class PathFormatter
         var invalidPattern = new Regex(@"[\\\/\:\*\?\042\<\>\|]");
         originFileName = invalidPattern.Replace(originFileName, "");
 
-        string extension = Path.GetExtension(originFileName);
-        string filename = Path.GetFileNameWithoutExtension(originFileName);
+        var extension = Path.GetExtension(originFileName);
+        var filename = Path.GetFileNameWithoutExtension(originFileName);
 
         pathFormat = pathFormat.Replace("{filename}", filename);
         pathFormat = new Regex(@"\{rand(\:?)(\d+)\}", RegexOptions.Compiled).Replace(pathFormat, new MatchEvaluator(delegate(Match match)

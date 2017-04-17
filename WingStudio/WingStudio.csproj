@@ -1170,7 +1170,6 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\OuterController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\SuperAdminController.cs" />
     <Compile Include="Global.asax.cs">
@@ -1212,7 +1211,9 @@
     <Compile Include="WebSecurity.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\web.config" />
+    <Content Include="Views\web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1487,7 +1488,6 @@
     <Folder Include="Scripts\UEditor\net\upload\file\" />
     <Folder Include="Scripts\UEditor\net\upload\image\" />
     <Folder Include="Scripts\UEditor\net\upload\video\" />
-    <Folder Include="Views\Outer\" />
     <Folder Include="WingStudio\Resource\" />
     <Folder Include="WingStudio\Temp\" />
   </ItemGroup>

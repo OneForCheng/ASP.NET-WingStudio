@@ -1,9 +1,8 @@
-﻿@using WingStudio.Models;
-@model WingStudio.Models.BlogGroup
+﻿@model WingStudio.Models.BlogGroup
 
 @{
     bool isModified = (ViewBag.IsModified == true);
-    string action = "AddBlogGroup";
+    var action = "AddBlogGroup";
     if (isModified)
     {
         action = "ModBlogGroup";

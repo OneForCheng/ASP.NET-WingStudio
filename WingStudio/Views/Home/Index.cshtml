@@ -1,5 +1,4 @@
-﻿@using WingStudio.Models;
-@{
+﻿@{
     ViewBag.Title = "首页";
     IQueryable<Notice> noitces = ViewBag.Notices;
     IQueryable<Notice> longNoitces = ViewBag.LongNotices;
@@ -19,44 +18,46 @@
             <div class="panel panel-default notice-panel">
                 <div class="menu">
                     <span class="menu-title"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span> 公告</span>
-                    <ul id="menuul">
+                    <ul>
                         <li><a id="notice_tab" onmouseover="NoticeToggle(false);" onfocus="NoticeToggle(false);" ondblclick="location.href='@Url.Action("Notices", "Home",new { isLong = false })'" title="双击查看所有信息" class="pointer tabactive">最新公告</a></li>
                         <li><a id="long_notice_tab" onmouseover="NoticeToggle(true);" onfocus="NoticeToggle(true);" ondblclick="location.href='@Url.Action("Notices", "Home",new { isLong = true })'" title="双击查看所有信息" class="pointer">长期公告</a></li>
                     </ul>
                 </div>
                 <div id="notice_info" class="list-info">
                     <ul>
-                        @if (noitces.Count() > 0)
+                        @if (noitces.Any())
                         {
                             foreach (var item in noitces)
                             {
-                        <li onclick="location.href='@Url.Action("ShowNotice", "Home",new { Id = item.Id })'" class="pointer">
-                            <a><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @item.Theme</a>
-                            <span class="date">@(((DateTime)item.PublicTime).ToLongDateString())</span>
-                        </li>
+                                <li onclick="location.href='@Url.Action("ShowNotice", "Home",new { item.Id })'" class="pointer">
+                                    <a><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @item.Theme</a>
+                                    <span class="date">@(item.PublicTime?.ToLongDateString())</span>
+                                </li>
                             }
                         }
                         else
                         {
-                        <li><center><a class="red">暂无任何信息!</a></center></li>
+                            <li>
+                                <div style="text-align: center;"><a class="red">暂无任何信息!</a></div>
+                            </li>
                         }
                     </ul>
                 </div>
                 <div id="long_notice_info" class="list-info" style="display:none">
                     <ul>
-                        @if (longNoitces.Count() > 0)
+                        @if (longNoitces.Any())
                         {
                             foreach (var item in longNoitces)
                             {
-                        <li onclick="location.href='@Url.Action("ShowNotice", "Home",new { Id = item.Id })'" class="pointer">
-                            <a><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @item.Theme</a>
-                            <span class="date">@(((DateTime)item.PublicTime).ToLongDateString())</span>
-                        </li>
+                                <li onclick="location.href='@Url.Action("ShowNotice", "Home",new { item.Id })'" class="pointer">
+                                    <a><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @item.Theme</a>
+                                    <span class="date">@(item.PublicTime?.ToLongDateString())</span>
+                                </li>
                             }
                         }
                         else
                         {
-                        <li><center><a class="red">暂无任何信息!</a></center></li>
+                            <li><div style="text-align: center;"><a class="red">暂无任何信息!</a></div></li>
                         }
                     </ul>
                 </div>
@@ -64,50 +65,50 @@
             <div class="panel panel-default dynamic-panel">
                 <div class="menu">
                     <span class="menu-title"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> 动态</span>
-                    <ul id="menuul">
+                    <ul>
                         <li><a id="unformal_dynamic_tab" onmouseover="DynamicToggle(false);" onfocus="DynamicToggle(false);" ondblclick="location.href='@Url.Action("Dynamics", "Home",new { isFormal = false })'" title="双击查看所有信息" class="pointer tabactive">活动风采</a></li>
                         <li><a id="formal_dynamic_tab" onmouseover="DynamicToggle(true);" onfocus="DynamicToggle(true);" ondblclick="location.href='@Url.Action("Dynamics", "Home",new { isFormal = true })'" title="双击查看所有信息" class="pointer">发展历程</a></li>
                     </ul>
                 </div>
-                @if (unformalDynamics.Count() > 0)
+                @if (unformalDynamics.Any())
                 {
-                <div id="unformal_dynamic_info" class="owl-carousel">
-                    @foreach (var item in unformalDynamics)
+                    <div id="unformal_dynamic_info" class="owl-carousel">
+                        @foreach (var item in unformalDynamics)
                         {
-                        <div class="item">
-                            <a href="@Url.Action("ShowDynamic","Home", new { id = item.Id })" title="@item.Theme">
-                                <img src="~/Content/Images/Shared/Icon/@item.Icon" />
-                            </a>
-                            <div class="caption">
+                            <div class="item">
                                 <a href="@Url.Action("ShowDynamic","Home", new { id = item.Id })" title="@item.Theme">
-                                    <h2>@item.Theme</h2>
+                                    <img src="~/Content/Images/Shared/Icon/@item.Icon" />
                                 </a>
+                                <div class="caption">
+                                    <a href="@Url.Action("ShowDynamic","Home", new { id = item.Id })" title="@item.Theme">
+                                        <h2>@item.Theme</h2>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
                         }
-                </div>
+                    </div>
                 }
                 else
                 {
-                <div id="unformal_dynamic_info">
-                    <div class="blank-data">暂无任何信息!</div>
-                </div>
+                    <div id="unformal_dynamic_info">
+                        <div class="blank-data">暂无任何信息!</div>
+                    </div>
                 }
                 <div id="formal_dynamic_info" class="list-info" style="display:none;">
                     <ul>
-                        @if (formalDynamics.Count() > 0)
+                        @if (formalDynamics.Any())
                         {
                             foreach (var item in formalDynamics)
                             {
-                        <li onclick="location.href='@Url.Action("ShowDynamic", "Home",new { Id = item.Id })'" class="pointer">
-                            <a><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @item.Theme</a>
-                            <span class="date">@(((DateTime)item.PublicTime).ToLongDateString())</span>
-                        </li>
+                                <li onclick="location.href='@Url.Action("ShowDynamic", "Home",new { item.Id })'" class="pointer">
+                                    <a><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> @item.Theme</a>
+                                    <span class="date">@(item.PublicTime?.ToLongDateString())</span>
+                                </li>
                             }
                         }
                         else
                         {
-                        <li><center><a class="red">暂无任何信息!</a></center></li>
+                            <li><div style="text-align: center;"><a class="red">暂无任何信息!</a></div></li>
                         }
                     </ul>
                 </div>
@@ -115,59 +116,59 @@
             <div class="panel panel-default share-panel">
                 <div class="menu">
                     <span class="menu-title"><span class="glyphicon glyphicon-share" aria-hidden="true"></span> 分享区</span>
-                    <ul id="menuul">
+                    <ul>
                         <li><a id="blog_share_tab" onmouseover="ShareToggle(false)" onfocus="ShareToggle(false);" ondblclick="location.href='@Url.Action("BlogColumn", "Home")'" title="双击查看所有信息" class="pointer tabactive">博客专栏</a></li>
                         <li><a id="resource_share_tab" onmouseover="ShareToggle(true)" onfocus="ShareToggle(true);" ondblclick="location.href='@Url.Action("ResourceColumn", "Home")'" title="双击查看所有信息" class="pointer">资源专栏</a></li>
                     </ul>
                 </div>
-                @if (blogGroups.Count() > 0)
+                @if (blogGroups.Any())
                 {
-                <div id="blog_share_info" class="owl-carousel">
-                    @foreach (var item in blogGroups)
+                    <div id="blog_share_info" class="owl-carousel">
+                        @foreach (var item in blogGroups)
                         {
-                        <div class="item">
-                            <a href="@Url.Action("ColumnBlogs","Home", new { id = item.Id })" title="@item.Description">
-                                <img src="~/Content/Images/Shared/Icon/@item.Icon" />
-                            </a>
-                            <div class="caption">
-                                <a href="@Url.Action("ColumnBlogs","Home", new { id = item.Id })" title="@item.Theme">
-                                    <h2>@item.Theme</h2>
+                            <div class="item">
+                                <a href="@Url.Action("ColumnBlogs","Home", new { id = item.Id })" title="@item.Description">
+                                    <img src="~/Content/Images/Shared/Icon/@item.Icon" />
                                 </a>
+                                <div class="caption">
+                                    <a href="@Url.Action("ColumnBlogs","Home", new { id = item.Id })" title="@item.Theme">
+                                        <h2>@item.Theme</h2>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
                         }
-                </div>
+                    </div>
                 }
                 else
                 {
-                <div id="blog_share_info">
-                    <div class="blank-data">暂无任何信息!</div>
-                </div>
+                    <div id="blog_share_info">
+                        <div class="blank-data">暂无任何信息!</div>
+                    </div>
                 }
 
-                @if (fileGroups.Count() > 0)
+                @if (fileGroups.Any())
                 {
-                <div id="resource_share_info" class="owl-carousel">
-                    @foreach (var item in fileGroups)
+                    <div id="resource_share_info" class="owl-carousel">
+                        @foreach (var item in fileGroups)
                         {
-                        <div class="item">
-                            <a href="@Url.Action("ColumnResources","Home", new { id = item.Id })" title="@item.Description">
-                                <img src="~/Content/Images/Shared/Icon/@item.Icon" />
-                            </a>
-                            <div class="caption">
-                                <a href="@Url.Action("ColumnResources","Home", new { id = item.Id })" title="@item.Theme">
-                                    <h2>@item.Theme</h2>
+                            <div class="item">
+                                <a href="@Url.Action("ColumnResources","Home", new { id = item.Id })" title="@item.Description">
+                                    <img src="~/Content/Images/Shared/Icon/@item.Icon" />
                                 </a>
+                                <div class="caption">
+                                    <a href="@Url.Action("ColumnResources","Home", new { id = item.Id })" title="@item.Theme">
+                                        <h2>@item.Theme</h2>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
                         }
-                </div>
+                    </div>
                 }
                 else
                 {
-                <div id="resource_share_info">
-                    <div class="blank-data">暂无任何信息!</div>
-                </div>
+                    <div id="resource_share_info">
+                        <div class="blank-data">暂无任何信息!</div>
+                    </div>
                 }
             </div>
         </div>
@@ -175,19 +176,19 @@
             <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
                 <div class="panel panel-info">
                     <div class="panel-body">
-                        @using (Html.BeginForm("SearchPublicBlog", "Home", FormMethod.Get, new { role = "form", id= "search_form" }))
+                        @using (Html.BeginForm("SearchPublicBlog", "Home", FormMethod.Get, new { role = "form", id = "search_form" }))
                         {
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="searchContent" placeholder="博客" id="search_input" required="required">
-                            <div class="input-group-btn">
-                                <button type="submit" class="btn btn-default search-btn">搜索</button>
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-                                <ul class="dropdown-menu dropdown-menu-right">
-                                    <li><a onclick="SearchTarget('blog', '/SearchPublicBlog', '博客');" class="pointer">博客(默认)</a></li>
-                                    <li><a onclick="SearchTarget('resource', '/SearchPublicResource', '资源');" class="pointer">资源</a></li>
-                                </ul>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="searchContent" placeholder="博客" id="search_input" required="required">
+                                <div class="input-group-btn">
+                                    <button type="submit" class="btn btn-default search-btn">搜索</button>
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li><a onclick="SearchTarget('blog', '/SearchPublicBlog', '博客');" class="pointer">博客(默认)</a></li>
+                                        <li><a onclick="SearchTarget('resource', '/SearchPublicResource', '资源');" class="pointer">资源</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
                         }
                     </div>
                 </div>
@@ -199,7 +200,7 @@
                             <div id="CalendarPre" class="CalendarPre">&lt;&lt;</div>
                             <div id="CalendarNext" class="CalendarNext">&gt;&gt;</div>
                             <span id="CalendarYear"></span>年 <span id="CalendarMonth"></span>月
-                            <table cellspacing="0">
+                            <table>
                                 <thead>
                                     <tr>
                                         <td>日</td>
@@ -215,9 +216,9 @@
                             </table>
                         </div>
                     </div>
-                    
+
                 </div>
-                
+
             </div>
             @if (ViewBag.ExistApp == true)
             {
@@ -233,46 +234,45 @@
             </div>
             }
             @*<div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
-                <div class="panel panel-success">
-                    <div class="panel-heading">最新博客</div>
-                    <ul class="list-group">
-                        @{
-                            var newBlogs = (IQueryable<Blog>)ViewBag.NewBlogs;
-                            if (newBlogs.Count() > 0)
-                            {
-                                foreach (var item in newBlogs)
+                    <div class="panel panel-success">
+                        <div class="panel-heading">最新博客</div>
+                        <ul class="list-group">
+                            @{
+                                var newBlogs = (IQueryable<Blog>)ViewBag.NewBlogs;
+                                if (newBlogs.Count() > 0)
                                 {
-                                    <li class="list-group-item">
-                                        <span class="badge" title="访问次数">@item.LookCount</span>
-                                        <a href="@Url.Action("ShowBlog","Home",new { id = item.Id})" title="阅读">[主题] @item.Theme - @(((DateTime)item.PublicTime).ToShortDateString())</a>
+                                    foreach (var item in newBlogs)
+                                    {
+                                        <li class="list-group-item">
+                                            <span class="badge" title="访问次数">@item.LookCount</span>
+                                            <a href="@Url.Action("ShowBlog","Home",new { id = item.Id})" title="阅读">[主题] @item.Theme - @(item.PublicTime.Value.ToShortDateString())</a>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="list-group-item red">
+                                        暂无博客
                                     </li>
                                 }
                             }
-                            else
-                            {
-                                <li class="list-group-item red">
-                                    暂无博客
-                                </li>
-                            }
-                        }
-                    </ul>
-                </div>
-            </div>*@
+                        </ul>
+                    </div>
+                </div>*@
             <div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
                 <div class="panel panel-success">
                     <div class="panel-heading">热门博客</div>
                     <ul class="list-group">
                         @{
                             var hotBlogs = (IQueryable<Blog>)ViewBag.HotBlogs;
-                            if (hotBlogs.Count() > 0)
+                            if (hotBlogs.Any())
                             {
-                                var typeText = "";
                                 foreach (var item in hotBlogs)
                                 {
-                                    typeText = (item.Type == BlogType.Jotting) ? "随笔" : "文章";
+                                    var typeText = (item.Type == BlogType.Jotting) ? "随笔" : "文章";
                                     <li class="list-group-item">
                                         <span class="badge" title="访问次数">@item.LookCount</span>
-                                        <a href="@Url.Action("ShowBlog","Home",new { id = item.Id})" title="阅读">[@typeText] @item.Theme - @(((DateTime)item.PublicTime).ToShortDateString())</a>
+                                        <a href="@Url.Action("ShowBlog","Home",new { id = item.Id})" title="阅读">[@typeText] @item.Theme - @(item.PublicTime?.ToShortDateString())</a>
                                     </li>
                                 }
                             }
@@ -287,42 +287,42 @@
                 </div>
             </div>
             @*<div class="col-xs-12 col-sm-6 col-md-12 col-lg-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading">最新资源</div>
-                    <ul class="list-group">
-                        @{
-                            var newFiles = (IQueryable<WebFile>)ViewBag.NewFiles;
-                            if (newFiles.Count() > 0)
-                            {
-                                foreach (var item in newFiles)
+                    <div class="panel panel-info">
+                        <div class="panel-heading">最新资源</div>
+                        <ul class="list-group">
+                            @{
+                                var newFiles = (IQueryable<WebFile>)ViewBag.NewFiles;
+                                if (newFiles.Count() > 0)
                                 {
-                                    <li class="list-group-item">
-                                        <span class="badge" title="访问次数">@(item.LoadCount + item.LookCount)</span>
-                                        @if (item.Type == FileType.Document)
-                                        {
-                                            <a href="@Url.Action("LookDocument","Home",new { id = item.Id})" title="阅读">[文档] @item.Name - @item.LastModTime.ToShortDateString()</a>
-                                        }
-                                        else if (item.Type == FileType.Video)
-                                        {
-                                            <a href="@Url.Action("PlayVideo","Home",new { id = item.Id})" title="观看">[视频] @item.Name - @item.LastModTime.ToShortDateString()</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="@Url.Action("LoadResource","Home",new { id = item.Id})" title="下载">[其它] @item.Name - @item.LastModTime.ToShortDateString()</a>
-                                        }
+                                    foreach (var item in newFiles)
+                                    {
+                                        <li class="list-group-item">
+                                            <span class="badge" title="访问次数">@(item.LoadCount + item.LookCount)</span>
+                                            @if (item.Type == FileType.Document)
+                                            {
+                                                <a href="@Url.Action("LookDocument","Home",new { id = item.Id})" title="阅读">[文档] @item.Name - @item.LastModTime.ToShortDateString()</a>
+                                            }
+                                            else if (item.Type == FileType.Video)
+                                            {
+                                                <a href="@Url.Action("PlayVideo","Home",new { id = item.Id})" title="观看">[视频] @item.Name - @item.LastModTime.ToShortDateString()</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("LoadResource","Home",new { id = item.Id})" title="下载">[其它] @item.Name - @item.LastModTime.ToShortDateString()</a>
+                                            }
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="list-group-item red">
+                                        暂无资源
                                     </li>
                                 }
                             }
-                            else
-                            {
-                                <li class="list-group-item red">
-                                    暂无资源
-                                </li>
-                            }
-                        }
-                    </ul>
-                </div>
-            </div>*@
+                        </ul>
+                    </div>
+                </div>*@
         </div>
 
     </div>
@@ -349,3 +349,6 @@
         </script>
     }
 }
+
+
+

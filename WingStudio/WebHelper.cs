@@ -8,7 +8,6 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using WingStudio.Models;
 
 namespace WingStudio
 {
@@ -48,18 +47,22 @@ namespace WingStudio
             var mailconfig = (EmailConfigurationProvider)ConfigurationManager.GetSection("EmailConfigurationProvider");
             try
             {
-                MailAddress from = new MailAddress(mailconfig.Account, mailconfig.Name);
-                MailAddress to = new MailAddress(toEmail, toEmail);
-                MailMessage message = new MailMessage(from, to);
-                message.Subject = subjectInfo;
-                message.IsBodyHtml = true;
-                message.Body = bodyInfo;
-                SmtpClient client = new SmtpClient(mailconfig.Server, mailconfig.Port);
-                client.EnableSsl = mailconfig.IsSSL;
-                client.Credentials = new NetworkCredential(mailconfig.Account, mailconfig.Password);
+                var from = new MailAddress(mailconfig.Account, mailconfig.Name);
+                var to = new MailAddress(toEmail, toEmail);
+                var message = new MailMessage(from, to)
+                {
+                    Subject = subjectInfo,
+                    IsBodyHtml = true,
+                    Body = bodyInfo
+                };
+                var client = new SmtpClient(mailconfig.Server, mailconfig.Port)
+                {
+                    EnableSsl = mailconfig.IsSSL,
+                    Credentials = new NetworkCredential(mailconfig.Account, mailconfig.Password)
+                };
                 client.Send(message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -75,19 +78,15 @@ namespace WingStudio
         /// <returns></returns>
         public static async Task<string> HttpRequest(string url, Dictionary<string, string> postParameters =null, string method = "POST")
         {
-            WebRequest request = WebRequest.Create(url);
+            var request = WebRequest.Create(url);
             request.Method = method;
             request.ContentType = "application/x-www-form-urlencoded";
             if (postParameters != null)
             {
-                string postData = "";
-                foreach (string key in postParameters.Keys)
-                {
-                    postData += HttpUtility.UrlEncode(key) + "=" + HttpUtility.UrlEncode(postParameters[key]) + "&";
-                }
-                byte[] data = Encoding.ASCII.GetBytes(postData);
+                var postData = postParameters.Keys.Aggregate("", (current, key) => current + (HttpUtility.UrlEncode(key) + "=" + HttpUtility.UrlEncode(postParameters[key]) + "&"));
+                var data = Encoding.ASCII.GetBytes(postData);
                 request.ContentLength = postData.Length;
-                using (Stream requestStream = request.GetRequestStream())
+                using (var requestStream = request.GetRequestStream())
                 {
                     await requestStream.WriteAsync(data, 0, postData.Length);
                 }

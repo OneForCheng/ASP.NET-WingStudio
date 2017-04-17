@@ -1,5 +1,4 @@
 ﻿@using PagedList.Mvc;
-@using PagedList;
 @model IPagedList<WingStudio.Models.Application>
 
 @{
@@ -43,7 +42,7 @@
                     <tbody>
                         @{
                             int page = ViewBag.PageNumber;
-                            int i = (page - 1) * 10;
+                            var i = (page - 1) * 10;
                             foreach (var item in Model)
                             {
                                 i++;

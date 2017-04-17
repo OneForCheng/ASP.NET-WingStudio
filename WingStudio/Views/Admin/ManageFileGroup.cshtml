@@ -1,5 +1,4 @@
 ﻿@using PagedList.Mvc;
-@using PagedList;
 @model IPagedList<WingStudio.Models.FileGroup>
 
 @{
@@ -30,7 +29,7 @@
                     <tbody>
                         @{
                             int page = ViewBag.PageNumber;
-                            int i = (page - 1) * 10;
+                            var i = (page - 1) * 10;
                             var strs = new []{ "全部不", "内部", "外部", "全部" };
                             foreach (var item in Model)
                             {

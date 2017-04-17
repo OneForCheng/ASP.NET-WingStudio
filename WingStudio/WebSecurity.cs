@@ -6,8 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using WingStudio.Models;
 
@@ -27,7 +25,7 @@ namespace WingStudio
                 string.IsNullOrWhiteSpace(validationContext.MemberName))
             {
                 str = Sanitizer.GetSafeHtmlFragment(str);
-                PropertyInfo pi = validationContext.ObjectType.GetProperty(validationContext.MemberName,
+                var pi = validationContext.ObjectType.GetProperty(validationContext.MemberName,
                     BindingFlags.Public | BindingFlags.Instance);
                 pi.SetValue(validationContext.ObjectInstance, str);
             }
@@ -175,7 +173,7 @@ namespace WingStudio
         /// <returns></returns>
         public static bool HasAuthority(this User user, AuthorityFlag authority)
         {
-            int auth = (int)authority;
+            var auth = (int)authority;
             if (user.Groups.Count(m => (m.Authority & auth) != 0) > 0)
             {
                 return true;
@@ -316,9 +314,9 @@ namespace WingStudio
             if (Regex.IsMatch(address, @"^[\u4e00-\u9fa5]{2,4}-[\u4e00-\u9fa5]{2,8}-[\u4e00-\u9fa5]{2,10}$"))
             {
                 var strs = address.Split('-');
-                StreamReader sr = new StreamReader(Path.Combine(path, @"WingStudio\DataFile\Areas.txt"));
-                string jsonStr1 = sr.ReadLine();
-                string jsonStr2 = sr.ReadLine();
+                var sr = new StreamReader(Path.Combine(path, @"WingStudio\DataFile\Areas.txt"));
+                var jsonStr1 = sr.ReadLine();
+                var jsonStr2 = sr.ReadLine();
                 sr.Close();
                 var serializer = new JavaScriptSerializer();
                 var provinces = serializer.Deserialize<List<Province>>(jsonStr1);
@@ -360,7 +358,7 @@ namespace WingStudio
         /// <returns></returns>
         public static bool UploadOverLimit(int fileSzie, List<WebFile> files)
         {
-            int sum = 0;
+            var sum = 0;
             if (files.Count() > 0)
             {
                 sum = files.Sum(m => m.FileSize);

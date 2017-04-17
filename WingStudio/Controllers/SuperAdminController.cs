@@ -3,9 +3,6 @@ using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using WingStudio.Models;
@@ -15,6 +12,9 @@ namespace WingStudio.Controllers
     [Authorize(Roles = "SuperAdmin")]
     public class SuperAdminController : BaseController
     {
+
+        private SuperUser Loginer => Entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
+
         #region 修改个人信息
         /// <summary>
         /// 修改个人信息
@@ -22,8 +22,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ChangeInfo()
         {
-            var logined = entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
-            return View("SaveInfo", logined);
+            return View("SaveInfo", Loginer);
         }
 
         /// <summary>
@@ -36,15 +35,15 @@ namespace WingStudio.Controllers
         {
             if(WebSecurity.IsValidAccount(account))
             {
-                if(entity.Users.Count(m => m.Account == account) > 0 || entity.SuperUsers.Count(m => m.Account == account) > 0)
+                if(Entity.Users.Count(m => m.Account == account) > 0 || Entity.SuperUsers.Count(m => m.Account == account) > 0)
                 {
                     return Json(new { title = "修改失败", message = "该用户账号已存在!" });
                 }
                 else
                 {
-                    var logined = entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
+                    var logined = Loginer;
                     logined.Account = account;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Json(new { title = "修改成功", message = "成功修改用户账号!" });
                 }
             }
@@ -66,11 +65,11 @@ namespace WingStudio.Controllers
         {
             if(WebSecurity.IsValidPassword(oldPassword) && WebSecurity.IsValidPassword(newPassword))
             {
-                var logined = entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 if(AES.Encrypt(oldPassword) == logined.Password)
                 {
                     logined.Password = AES.Encrypt(newPassword);
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Json(new { title = "修改成功", message = "成功修改密码!" });
                 }
                 else
@@ -96,13 +95,13 @@ namespace WingStudio.Controllers
             if(WebSecurity.IsValidSecQusetion(qusetion, answer))
             {
                 var flag = (SecurityFlag)qusetion;
-                var logined = entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
+                var logined = Loginer;
                 logined.SecQuestion = flag;
                 if(flag != SecurityFlag.None)
                 {
                     logined.SecAnswer = AES.Encrypt(answer.Trim());
                 }
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Json(new { title = "修改成功", message = "成功修改安全提问!" });
             }
             else
@@ -121,7 +120,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ManageUserGroup(int? page)
         {
-            var groups = entity.UserGroups.OrderByDescending(m => m.Id);
+            var groups = Entity.UserGroups.OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             ViewBag.PageNumber = pageNumber;
             var onePageOfProducts = groups.ToPagedList(pageNumber, 10);
@@ -149,11 +148,13 @@ namespace WingStudio.Controllers
         {
             if(WebSecurity.IsValidUserGroup(group))
             {
-                var newGroup = new UserGroup();
-                newGroup.Theme = group.Theme;
-                newGroup.Authority = group.Authority;
-                entity.UserGroups.Add(newGroup);
-                entity.SaveChanges();
+                var newGroup = new UserGroup
+                {
+                    Theme = @group.Theme,
+                    Authority = @group.Authority
+                };
+                Entity.UserGroups.Add(newGroup);
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("添加成功", "成功添加用户组!", "location.href='/SuperAdmin/ManageUserGroup'"));
             }
             else
@@ -170,7 +171,7 @@ namespace WingStudio.Controllers
         [HttpGet]
         public ActionResult ModUserGroup(int id)
         {
-            var group = entity.UserGroups.Find(id);
+            var group = Entity.UserGroups.Find(id);
             if (group != null)
             {
                 ViewBag.IsModified = true;
@@ -191,14 +192,14 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult ModUserGroup(int id, UserGroup group)
         {
-            var target = entity.UserGroups.Find(id);
+            var target = Entity.UserGroups.Find(id);
             if (target != null)
             {
                 if(WebSecurity.IsValidUserGroup(group))
                 {
                     target.Theme = group.Theme;
                     target.Authority = group.Authority;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("修改成功", "成功修改指定用户组!", "location.href='/SuperAdmin/ManageUserGroup'"));
                 }
                 else
@@ -219,12 +220,12 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult DelUserGroup(int id)
         {
-            var group = entity.UserGroups.Find(id);
+            var group = Entity.UserGroups.Find(id);
             if (group != null)
             {
                 //group.InnerUsers.Clear();
-                entity.UserGroups.Remove(group);
-                entity.SaveChanges();
+                Entity.UserGroups.Remove(group);
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("删除成功", "成功删除指定用户组!", "location.href='/SuperAdmin/ManageUserGroup'"));
             }
             else
@@ -241,7 +242,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowGroupUsers(int id, int? page)
         {
-            var group = entity.UserGroups.Find(id);
+            var group = Entity.UserGroups.Find(id);
             if (group != null)
             {
                 ViewBag.GroupId = id;
@@ -268,12 +269,12 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult AddUserToGroup(int id, int groupId)
         {
-            var admin = entity.Users.Find(id);
-            var group = entity.UserGroups.Find(groupId);
+            var admin = Entity.Users.Find(id);
+            var group = Entity.UserGroups.Find(groupId);
             if (admin != null && group != null)
             {
                 group.Users.Add(admin);
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Json(new {title = "添加成功", message = "成功添加指定用户到指定组!" });
             }
             else
@@ -290,11 +291,11 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult GetBaseUserInfos(int id)
         {
-            var group = entity.UserGroups.Find(id);
+            var group = Entity.UserGroups.Find(id);
             if(group != null)
             {
-                var userInfos = entity.Users.ToList().Except(group.Users).Select(m => new {m.Id, m.Account, m.Name }).OrderByDescending(m => m.Id);
-                if(userInfos.Count() > 0)
+                var userInfos = Entity.Users.ToList().Except(group.Users).Select(m => new {m.Id, m.Account, m.Name }).OrderByDescending(m => m.Id);
+                if(userInfos.Any())
                 {
                     return Json((new JavaScriptSerializer()).Serialize(userInfos));
                 }
@@ -317,12 +318,12 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult DelUserFromGroup(int id, int groupId)
         {
-            var admin = entity.Users.Find(id);
-            var group = entity.UserGroups.Find(groupId);
+            var admin = Entity.Users.Find(id);
+            var group = Entity.UserGroups.Find(groupId);
             if (admin != null && group != null && group.Users.Count(m => m.Id == id) > 0)
             {
                 group.Users.Remove(admin);
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return Content(WebHelper.SweetAlert("删除成功", "成功从指定组中删除指定用户!", "location.href='/SuperAdmin/ShowGroupUsers/" + groupId + "'"));
             }
             else
@@ -342,7 +343,7 @@ namespace WingStudio.Controllers
         public ActionResult ManageUser(int? page)
         {
             ViewBag.IsSearch = false;
-            var users = entity.Users.OrderByDescending(m => m.Id);
+            var users = Entity.Users.OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             ViewBag.PageNumber = pageNumber;
             var onePageOfProducts = users.ToPagedList(pageNumber, 10);
@@ -356,7 +357,7 @@ namespace WingStudio.Controllers
         [HttpPost]
         public ActionResult GetUserDetailInfo(int id)
         {
-            var user = entity.Users.Find(id);
+            var user = Entity.Users.Find(id);
             if(user != null)
             {
                 var userInfo = user.UserInfo;
@@ -409,27 +410,29 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidUser(user))
             {
-                if (entity.Users.Count(m => m.Account == user.Account) > 0 || entity.SuperUsers.Count(m => m.Account == user.Account) > 0)
+                if (Entity.Users.Count(m => m.Account == user.Account) > 0 || Entity.SuperUsers.Count(m => m.Account == user.Account) > 0)
                 {
                     return Content(WebHelper.SweetAlert("添加失败", "此账号已被注册!"));
                 }
-                var newUser = new User();
-                newUser.Account = user.Account;
-                newUser.Password = AES.Encrypt(user.Password);
-                newUser.Email = user.Email;
-                newUser.Name = user.Name;
-                newUser.Grade = user.Grade;
-                newUser.Sex = (user.Sex == "M") ? "M" : "W";
-                newUser.UserInfo = new UserInfo();
-                newUser.UserConfig = new UserConfig();
-                newUser.Favorites = new Favorites();
-                newUser.Recommendations = new Recommendations();
+                var newUser = new User
+                {
+                    Account = user.Account,
+                    Password = AES.Encrypt(user.Password),
+                    Email = user.Email,
+                    Name = user.Name,
+                    Grade = user.Grade,
+                    Sex = (user.Sex == "M") ? "M" : "W",
+                    UserInfo = new UserInfo(),
+                    UserConfig = new UserConfig(),
+                    Favorites = new Favorites(),
+                    Recommendations = new Recommendations()
+                };
 
-                entity.Users.Add(newUser);
-                entity.SaveChanges();
+                Entity.Users.Add(newUser);
+                Entity.SaveChanges();
 
                 //添加初始文件资源配置
-                Dictionary<FileType, string> dic = new Dictionary<FileType, string> {
+                var dic = new Dictionary<FileType, string> {
                     { FileType.Picture,"图片" },
                     { FileType.Video,"视频" },
                     { FileType.Music,"音乐" },
@@ -439,15 +442,17 @@ namespace WingStudio.Controllers
                 };
                 foreach (var item in dic)
                 {
-                    var folder = new WebFolder();
-                    folder.Owner = newUser;
-                    folder.Type = item.Key;
-                    folder.Name = item.Value;
-                    entity.WebFolders.Add(folder);
+                    var folder = new WebFolder
+                    {
+                        Owner = newUser,
+                        Type = item.Key,
+                        Name = item.Value
+                    };
+                    Entity.WebFolders.Add(folder);
                 }
-                entity.SaveChanges();
-                var logined = entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
-                infoLog.Info($"Envent:[添加用户事件] AddUser[Name:{newUser.Name} Account:{newUser.Account}] Operator[Role:SuperAdmin Account:{logined.Account} Id:{logined.Id}]");
+                Entity.SaveChanges();
+                var logined = Loginer;
+                InfoLog.Info($"Envent:[添加用户事件] AddUser[Name:{newUser.Name} Account:{newUser.Account}] Operator[Role:SuperAdmin Account:{logined.Account} Id:{logined.Id}]");
                 return Content(WebHelper.SweetAlert("添加成功", "成功添加用户!"));
             }
             else
@@ -465,62 +470,62 @@ namespace WingStudio.Controllers
         {
             //此功能应该在后期去掉，只用于测试
 
-            var user = entity.Users.Find(id);
+            var user = Entity.Users.Find(id);
             if (user != null)
             {
                 //user.Groups.Clear();
-                entity.UserInfos.Remove(user.UserInfo);
-                entity.UserConfigs.Remove(user.UserConfig);
-                entity.Favorites.Remove(user.Favorites);
+                Entity.UserInfos.Remove(user.UserInfo);
+                Entity.UserConfigs.Remove(user.UserConfig);
+                Entity.Favorites.Remove(user.Favorites);
                 if(user.Recommendations != null)
                 {
-                    entity.Recommendations.Remove(user.Recommendations);
+                    Entity.Recommendations.Remove(user.Recommendations);
                 }
                
-                entity.Users.Remove(user);
+                Entity.Users.Remove(user);
 
-                var msgs = entity.Messages.Where(m => m.OwnId == id);
-                if(msgs.Count() > 0)
+                var msgs = Entity.Messages.Where(m => m.OwnId == id);
+                if(msgs.Any())
                 {
                     foreach (var msg in msgs)
                     {
-                        entity.Packets.RemoveRange(msg.Packets);
+                        Entity.Packets.RemoveRange(msg.Packets);
                     }
-                    entity.Messages.RemoveRange(msgs);
+                    Entity.Messages.RemoveRange(msgs);
                 }
 
-                var files = entity.WebFiles.Where(m => m.Owner.Id == id);
-                if (files.Count() > 0)
+                var files = Entity.WebFiles.Where(m => m.Owner.Id == id);
+                if (files.Any())
                 {
                     //foreach (var file in files)
                     //{
                     //    file.Groups.Clear();
                     //}
-                    entity.WebFiles.RemoveRange(files);
+                    Entity.WebFiles.RemoveRange(files);
                 }
                 
-                var folders = entity.WebFolders.Where(m => m.Owner.Id == id);
-                if (folders.Count() > 0)
+                var folders = Entity.WebFolders.Where(m => m.Owner.Id == id);
+                if (folders.Any())
                 {
                     foreach (var folder in folders)
                     {
                         folder.SubFolders.Clear();
                     }
-                    entity.WebFolders.RemoveRange(folders);
+                    Entity.WebFolders.RemoveRange(folders);
                 }
 
-                var blogs = entity.Blogs.Where(m => m.Owner.Id == id);
-                if (blogs.Count() > 0)
+                var blogs = Entity.Blogs.Where(m => m.Owner.Id == id);
+                if (blogs.Any())
                 {
                     //foreach(var blog in blogs)
                     //{
                     //    blog.Groups.Clear();
                     //}
-                    entity.Blogs.RemoveRange(blogs);
+                    Entity.Blogs.RemoveRange(blogs);
                 }
-                entity.SaveChanges();
-                var logined = entity.SuperUsers.Find(Convert.ToInt32(User.Identity.Name));
-                infoLog.Info($"Envent:[删除用户事件] DelUser[Name:{user.Name} Account:{user.Account}] Operator[Role:SuperAdmin Account:{logined.Account} Id:{logined.Id}]");
+                Entity.SaveChanges();
+                var logined = Loginer;
+                InfoLog.Info($"Envent:[删除用户事件] DelUser[Name:{user.Name} Account:{user.Account}] Operator[Role:SuperAdmin Account:{logined.Account} Id:{logined.Id}]");
                 return Content(WebHelper.SweetAlert("删除成功", "成功删除用户!"));
             }
             else
@@ -537,19 +542,19 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ForbiddenUser(int id)
         {
-            var user = entity.Users.Find(id);
+            var user = Entity.Users.Find(id);
             if (user != null)
             {
                 if (user.IsForbidden)
                 {
                     user.IsForbidden = false;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作成功", "已成功解除该用户的禁用!"));
                 }
                 else
                 {
                     user.IsForbidden = true;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作成功", "已成功禁用该用户!"));
                 }
             }
@@ -575,7 +580,7 @@ namespace WingStudio.Controllers
             else
             {
                 searchContent = searchContent.Trim();
-                var users = entity.Users.Where(m => m.Name.Contains(searchContent) || m.Account.Contains(searchContent)).OrderByDescending(m => m.Id);
+                var users = Entity.Users.Where(m => m.Name.Contains(searchContent) || m.Account.Contains(searchContent)).OrderByDescending(m => m.Id);
                 var pageNumber = page ?? 1;
                 ViewBag.PageNumber = pageNumber;
                 var onePageOfProducts = users.ToPagedList(pageNumber, 10);

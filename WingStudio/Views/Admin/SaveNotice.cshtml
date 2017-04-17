@@ -1,7 +1,7 @@
 ﻿@model WingStudio.Models.Notice
 @{
     bool isModified = (ViewBag.IsModified == true);
-    string action = "AddNotice";
+    var action = "AddNotice";
     if (isModified)
     {
         action = "ModNotice";

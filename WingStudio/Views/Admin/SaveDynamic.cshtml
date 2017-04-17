@@ -1,7 +1,7 @@
 ﻿@model WingStudio.Models.Dynamic
 @{
     bool isModified = (ViewBag.IsModified == true);
-    string action = "AddDynamic";
+    var action = "AddDynamic";
     if (isModified)
     {
         action = "ModDynamic";

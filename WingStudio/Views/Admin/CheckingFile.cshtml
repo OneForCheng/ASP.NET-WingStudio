@@ -1,6 +1,4 @@
-﻿@using WingStudio.Models;
-@using PagedList.Mvc;
-@using PagedList;
+﻿@using PagedList.Mvc;
 @model IPagedList<WingStudio.Models.WebFile>
 
 @{
@@ -31,9 +29,9 @@
                     <tbody>
                         @{
                             int page = ViewBag.PageNumber;
-                            int i = (page - 1) * 10;
+                            var i = (page - 1) * 10;
                             var url = "";
-                            Dictionary<FileType, string> dic = new Dictionary<FileType, string> {
+                            var dic = new Dictionary<FileType, string> {
                                 {FileType.Picture,"图片"},
                                 {FileType.Video,"视频"},
                                 {FileType.Music,"音乐"},

@@ -1,11 +1,8 @@
 ﻿using log4net;
-using log4net.Appender;
 using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using WingStudio.Models;
@@ -15,10 +12,8 @@ namespace WingStudio.Controllers
 
     public class BaseController : Controller
     {
-        protected WebAppContext entity = new WebAppContext();
-        protected ILog infoLog  = LogManager.GetLogger("InfoLogger");
-
-        
+        protected WebAppContext Entity = new WebAppContext();
+        protected ILog InfoLog  = LogManager.GetLogger("InfoLogger");
 
         /// <summary>
         /// 获取该月存在博客的情况
@@ -36,14 +31,14 @@ namespace WingStudio.Controllers
             try
             {
                 var days = DateTime.DaysInMonth(year, month);
-                List<DayBlog> list = new List<DayBlog>();
-                var blogs = entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month);
+                var list = new List<DayBlog>();
+                var blogs = Entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month);
                 var controller = RouteData.Values["controller"].ToString();
                 if (!controller.Equals("user", StringComparison.InvariantCultureIgnoreCase))
                 {
                     blogs = blogs.Where(m => m.Owner.UserConfig.PublicBlog || (m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0));
                 }
-                for (int i = 1; i <= days; i++)
+                for (var i = 1; i <= days; i++)
                 {
                     list.Add(new DayBlog {  Count = blogs.Count(m => ((DateTime)m.PublicTime).Day == i) });
                 }
@@ -73,7 +68,7 @@ namespace WingStudio.Controllers
             }
             try
             {
-                var blogs = entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month && ((DateTime)m.PublicTime).Day == day);
+                var blogs = Entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month && ((DateTime)m.PublicTime).Day == day);
 
                 var controller = RouteData.Values["controller"].ToString();
                 if (!controller.Equals("user", StringComparison.InvariantCultureIgnoreCase))
@@ -82,7 +77,7 @@ namespace WingStudio.Controllers
                 }
                 else
                 {
-                    ViewBag.Logined = entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                    ViewBag.Logined = Entity.Users.Find(Convert.ToInt32(User.Identity.Name));
                 }
 
                 ViewBag.Title = $"{year}年{month}月{day}日 - 博客档案";

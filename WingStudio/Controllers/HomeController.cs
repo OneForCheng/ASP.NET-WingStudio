@@ -3,13 +3,10 @@ using ForCheng.Web.ValidateCode;
 using PagedList;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -30,23 +27,23 @@ namespace WingStudio.Controllers
         {
             
             if (TempData["NoLogin"] != null)
-            {
+            {   
                 ViewBag.Login = true;
             }
-            var notices = entity.Notices.Where(m => m.IsPublic);
-            var dynamics = entity.Dynamics.Where(m => m.IsPublic);
+            var notices = Entity.Notices.Where(m => m.IsPublic);
+            var dynamics = Entity.Dynamics.Where(m => m.IsPublic);
             var timeLimit = DateTime.Now.AddMonths(-1);
             ViewBag.LongNotices = notices.Where(m => m.IsLong).OrderByDescending(m => m.Id).Take(7);
             ViewBag.Notices = notices.OrderByDescending(m => m.Id).Take(7);
             ViewBag.FormalDynamics = dynamics.Where(m => m.IsFormal).OrderByDescending(m => m.Id).Take(7);
             ViewBag.UnFormalDynamics = dynamics.Where(m => !m.IsFormal).OrderByDescending(m => m.Id).Take(10);
-            ViewBag.BlogGroups = entity.BlogGroups.Where(m => (m.Accessible & Accessible.Outer) != 0).OrderByDescending(m => m.Id).Take(10);
-            ViewBag.FileGroups = entity.FileGroups.Where(m => (m.Accessible & Accessible.Outer) != 0).OrderByDescending(m => m.Id).Take(10);
+            ViewBag.BlogGroups = Entity.BlogGroups.Where(m => (m.Accessible & Accessible.Outer) != 0).OrderByDescending(m => m.Id).Take(10);
+            ViewBag.FileGroups = Entity.FileGroups.Where(m => (m.Accessible & Accessible.Outer) != 0).OrderByDescending(m => m.Id).Take(10);
             //ViewBag.NewBlogs = entity.Blogs.Where(m => m.IsPublic).Where(m => m.Owner.UserConfig.PublicBlog || m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.PublicTime).Take(5);
-            ViewBag.HotBlogs = entity.Blogs.Where(m => m.IsPublic).Where(m => m.Owner.UserConfig.PublicBlog || m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).Where(m => m.CreateTime > timeLimit).OrderByDescending(m => m.LookCount).Take(5);
+            ViewBag.HotBlogs = Entity.Blogs.Where(m => m.IsPublic).Where(m => m.Owner.UserConfig.PublicBlog || m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).Where(m => m.CreateTime > timeLimit).OrderByDescending(m => m.LookCount).Take(5);
             //ViewBag.NewFiles = entity.WebFiles.Where(m => m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.Id).Take(5);
-            var apps = entity.Applications.Where(m => m.StartTime <= DateTime.Now && m.EndTime >= DateTime.Now).OrderByDescending(m => m.Id);
-            if(apps.Count() > 0)
+            var apps = Entity.Applications.Where(m => m.StartTime <= DateTime.Now && m.EndTime >= DateTime.Now).OrderByDescending(m => m.Id);
+            if(apps.Any())
             {
                 ViewBag.ExistApp = true;
                 ViewBag.App = apps.First();
@@ -157,19 +154,19 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidLoginUser(user))
             {
-                string role = "User";
-                dynamic logined = null;
+                var role = "User";
+                dynamic logined;
                 if (user.IsAdmin)
                 {
-                    logined = entity.SuperUsers.SingleOrDefault(m => m.Account == user.Account);
+                    logined = Entity.SuperUsers.SingleOrDefault(m => m.Account == user.Account);
                     if (logined != null)
                     {
                         role = "SuperAdmin";
                     }
                     else
                     {
-                        logined = entity.Users.SingleOrDefault(m => m.Account == user.Account);
-                        if (logined != null && ((User)logined).Groups.Count() > 0)
+                        logined = Entity.Users.SingleOrDefault(m => m.Account == user.Account);
+                        if (logined != null && ((User)logined).Groups.Any())
                         {
                             role = "Admin";
                         }
@@ -181,7 +178,7 @@ namespace WingStudio.Controllers
                 }
                 else
                 {
-                    logined = entity.Users.SingleOrDefault(m => m.Account == user.Account);
+                    logined = Entity.Users.SingleOrDefault(m => m.Account == user.Account);
                     if (logined == null)
                     {
                         return Json(new { title = "登录失败", error = "登录信息错误!" });
@@ -202,7 +199,7 @@ namespace WingStudio.Controllers
                             return Json(new { title = "登录失败", error = "登录受到限制,请与管理员联系!" });
                         }
                     }
-                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(
+                    var authTicket = new FormsAuthenticationTicket(
                         1,
                         logined.Id.ToString(),
                         DateTime.Now,
@@ -210,21 +207,18 @@ namespace WingStudio.Controllers
                         false,
                         role
                     );
-                    string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
-                    HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+                    var encryptedTicket = FormsAuthentication.Encrypt(authTicket);
+                    var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
                     System.Web.HttpContext.Current.Response.Cookies.Add(authCookie);
-                    infoLog.Info($"Envent:[登录事件] LoginUser[Role:{role} Account:{user.Account} Id:{logined.Id}]");
-                    if (role == "User")
+                    InfoLog.Info($"Envent:[登录事件] LoginUser[Role:{role} Account:{user.Account} Id:{logined.Id}]");
+                    switch (role)
                     {
-                        return Json(new { title = "登录成功", href = "/User" });
-                    }
-                    else if (role == "Admin")
-                    {
-                        return Json(new { title = "登录成功", href = "/Admin" });
-                    }
-                    else
-                    {
-                        return Json(new { title = "登录成功", href = "/SuperAdmin" });
+                        case "User":
+                            return Json(new { title = "登录成功", href = "/User" });
+                        case "Admin":
+                            return Json(new { title = "登录成功", href = "/Admin" });
+                        default:
+                            return Json(new { title = "登录成功", href = "/SuperAdmin" });
                     }
                 }
             }
@@ -241,7 +235,7 @@ namespace WingStudio.Controllers
         [Authorize]
         public ActionResult Logoff()
         {
-            System.Web.Security.FormsAuthentication.SignOut();
+            FormsAuthentication.SignOut();
             return RedirectToAction("Index");
         }
 
@@ -256,14 +250,14 @@ namespace WingStudio.Controllers
         private string GetClientIp()
         {
             //可以透过代理服务器
-            string userIP = System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+            var clientIp = System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             //判断是否有代理服务器
-            if (string.IsNullOrEmpty(userIP))
+            if (string.IsNullOrEmpty(clientIp))
             {
                 //没有代理服务器,如果有代理服务器获取的是代理服务器的IP
-                userIP = System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+                clientIp = System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
             }
-            return userIP;
+            return clientIp;
         }
 
         /// <summary>
@@ -272,8 +266,8 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult GetValidateCode(string type)
         {
-            ValidateCode vCode = new ValidateCode();
-            string code = vCode.CreateValidateString(CodeType.All, 5);
+            var vCode = new ValidateCode();
+            var code = vCode.CreateValidateString(CodeType.All);
             Session["ForgetPwdCode"] = "";
             Session["ApplyCode"] = "";
             if(type !=null && type.ToLower() == "forget")
@@ -284,7 +278,7 @@ namespace WingStudio.Controllers
             {
                 Session["ApplyCode"] = code;
             }
-            byte[] bytes = vCode.CreateValidateGraphic(code);
+            var bytes = vCode.CreateValidateGraphic(code);
             return File(bytes, @"image/jpeg");
         }
 
@@ -309,21 +303,21 @@ namespace WingStudio.Controllers
             else
             {
                 name = name.Trim();
-                var user = entity.Users.SingleOrDefault(m => m.Account == account && m.Name == name);
+                var user = Entity.Users.SingleOrDefault(m => m.Account == account && m.Name == name);
                 if (user == null)
                 {
                     return Json(new { title = "申请失败", message = "用户信息错误!" });
                 }
                 else
                 {
-                    var resetCode = entity.ResetCodes.SingleOrDefault(m => m.Account == account);
+                    var resetCode = Entity.ResetCodes.SingleOrDefault(m => m.Account == account);
                     if (resetCode != null)
                     {
                         if ((DateTime.Now - resetCode.CreateTime).TotalMinutes > 30)
                         {
                             //找回密码的重置码信息失效
-                            entity.ResetCodes.Remove(resetCode);
-                            entity.SaveChanges();
+                            Entity.ResetCodes.Remove(resetCode);
+                            Entity.SaveChanges();
                         }
                         else
                         {
@@ -331,21 +325,23 @@ namespace WingStudio.Controllers
                         }
                     }
                     
-                    string guidCode = Guid.NewGuid().ToString("N");
-                    string hostUrl = Request.Url.AbsoluteUri.Replace(Request.RawUrl, "");//网站域名
-                    string subjectInfo = "[WingStudio]重置密码通知";
+                    var guidCode = Guid.NewGuid().ToString("N");
+                    var hostUrl = Request.Url?.AbsoluteUri.Replace(Request.RawUrl, "");//网站域名
+                    var subjectInfo = "[WingStudio]重置密码通知";
 
-                    StreamReader sr = new StreamReader(Server.MapPath("~/Page/ForgotPassword.html"));
-                    var bodyInfo = sr.ReadToEnd().Replace("[Account]", account).Replace("[Code]", guidCode).Replace("[HostUrl]", hostUrl).Replace("[ValidTime]", (DateTime.Now.ToString() + " - " + DateTime.Now.AddMinutes(30).ToString())).Replace("[ClientIp]", GetClientIp()).Replace("[Year]", DateTime.Now.Year.ToString());
+                    var sr = new StreamReader(Server.MapPath("~/Page/ForgotPassword.html"));
+                    var bodyInfo = sr.ReadToEnd().Replace("[Account]", account).Replace("[Code]", guidCode).Replace("[HostUrl]", hostUrl??"").Replace("[ValidTime]", (DateTime.Now.ToString(CultureInfo.InvariantCulture) + " - " + DateTime.Now.AddMinutes(30).ToString(CultureInfo.InvariantCulture))).Replace("[ClientIp]", GetClientIp()).Replace("[Year]", DateTime.Now.Year.ToString());
                     sr.Close();
 
                     if(WebHelper.SendMail(user.Email, subjectInfo, bodyInfo))
                     {
-                        var newCode = new ResetCode();
-                        newCode.Account = account;
-                        newCode.Value = guidCode;
-                        entity.ResetCodes.Add(newCode);
-                        entity.SaveChanges();
+                        var newCode = new ResetCode
+                        {
+                            Account = account,
+                            Value = guidCode
+                        };
+                        Entity.ResetCodes.Add(newCode);
+                        Entity.SaveChanges();
 
                         var mail = user.Email;
                         var strs = mail.Split('@');
@@ -366,7 +362,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Find(string code)
         {
-            if(!string.IsNullOrWhiteSpace(code) && entity.ResetCodes.Count(m => m.Value == code) > 0)
+            if(!string.IsNullOrWhiteSpace(code) && Entity.ResetCodes.Count(m => m.Value == code) > 0)
             {
                 return View();
             }
@@ -388,21 +384,21 @@ namespace WingStudio.Controllers
         {
             if (WebSecurity.IsValidResetPassword(account, code, newPassword))
             {
-                var user = entity.Users.SingleOrDefault(m => m.Account == account);
-                var oneCode = entity.ResetCodes.SingleOrDefault(m => m.Account == account && m.Value == code);
+                var user = Entity.Users.SingleOrDefault(m => m.Account == account);
+                var oneCode = Entity.ResetCodes.SingleOrDefault(m => m.Account == account && m.Value == code);
                 if (user != null && oneCode != null)
                 {
-                    entity.ResetCodes.Remove(oneCode);
+                    Entity.ResetCodes.Remove(oneCode);
                     if ((DateTime.Now - oneCode.CreateTime).TotalMinutes <= 30)
                     {
                         user.Password = AES.Encrypt(newPassword);
                         user.SecQuestion = SecurityFlag.None;
-                        entity.SaveChanges();
+                        Entity.SaveChanges();
                         return Content(WebHelper.SweetAlert("重置成功", "成功重置密码,并且安全提问改为默认设置!", "location.href='/Index'"));
                     }
                     else
                     {
-                        entity.SaveChanges();
+                        Entity.SaveChanges();
                         return Content(WebHelper.SweetAlert("重置失败", "无效的确认码,请重新找回密码!", "window.history.go(-1);"));
                     }
                 }
@@ -429,11 +425,11 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Notices(bool? isLong, int? page)
         {
-            bool flag = isLong ?? false;
-            var notices = entity.Notices.Where(m => m.IsPublic).OrderByDescending(m => m.Id);
+            var flag = isLong ?? false;
+            var notices = Entity.Notices.Where(m => m.IsPublic).OrderByDescending(m => m.Id);
             if (flag)
             {
-                notices = entity.Notices.Where(m => m.IsPublic && m.IsLong == true).OrderByDescending(m => m.Id);
+                notices = Entity.Notices.Where(m => m.IsPublic && m.IsLong).OrderByDescending(m => m.Id);
             }
 
             ViewBag.IsLong = flag;
@@ -450,20 +446,17 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowNotice(int id)
         {
-            var notice = entity.Notices.Find(id);
+            var notice = Entity.Notices.Find(id);
             if (notice != null && (notice.IsPublic || (Request.IsAuthenticated && User.IsInRole("Admin"))))
             {
                 notice.LookCount++;
-                entity.SaveChanges();
-                var notices = entity.Notices.Where(m => m.IsPublic);
+                Entity.SaveChanges();
+                var notices = Entity.Notices.Where(m => m.IsPublic);
                 ViewBag.LastNotice = notices.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
                 ViewBag.NextNotice = notices.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
                 return View(notice);
             }
-            else
-            {
-                return View("Error");
-            }
+            return View("Error");
         }
 
         #endregion
@@ -478,8 +471,8 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Dynamics(bool? isFormal, int? page)
         {
-            bool flag = isFormal ?? false;
-            var dynamics = entity.Dynamics.Where(m => m.IsPublic && m.IsFormal == flag).OrderByDescending(m => m.Id);
+            var flag = isFormal ?? false;
+            var dynamics = Entity.Dynamics.Where(m => m.IsPublic && m.IsFormal == flag).OrderByDescending(m => m.Id);
             ViewBag.IsFormal = flag;
             var pageNumber = page ?? 1;
             ViewBag.PageNumber = pageNumber;
@@ -494,12 +487,12 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowDynamic(int id)
         {
-            var dynamic = entity.Dynamics.Find(id);
+            var dynamic = Entity.Dynamics.Find(id);
             if (dynamic != null && (dynamic.IsPublic || (Request.IsAuthenticated && User.IsInRole("Admin"))))
             {
                 dynamic.LookCount++;
-                entity.SaveChanges();
-                var dynamics = entity.Dynamics.Where(m => m.IsPublic);
+                Entity.SaveChanges();
+                var dynamics = Entity.Dynamics.Where(m => m.IsPublic);
                 ViewBag.LastDynamic = dynamics.Where(m => m.IsFormal == dynamic.IsFormal && m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
                 ViewBag.NextDynamic = dynamics.Where(m => m.IsFormal == dynamic.IsFormal && m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
                 return View(dynamic);
@@ -520,7 +513,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult BlogColumn(int ?page)
         {
-            var groups = entity.BlogGroups.Where(m => (m.Accessible & Accessible.Outer) != 0).OrderByDescending(m => m.Id);
+            var groups = Entity.BlogGroups.Where(m => (m.Accessible & Accessible.Outer) != 0).OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             var onePageOfProducts = groups.ToPagedList(pageNumber, 12);
             return View(onePageOfProducts);
@@ -530,10 +523,11 @@ namespace WingStudio.Controllers
         /// 专栏博客
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult ColumnBlogs(int id, int? page)
         {
-            var blogGroup = entity.BlogGroups.Find(id);
+            var blogGroup = Entity.BlogGroups.Find(id);
             if (blogGroup != null && (blogGroup.Accessible & Accessible.Outer) != 0)
             {
                 ViewBag.GroupId = id;
@@ -557,7 +551,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult Blogs(string id, int? page)
         {
-            var user = entity.Users.SingleOrDefault(m => m.Account == id);
+            var user = Entity.Users.SingleOrDefault(m => m.Account == id);
             if (user != null)
             {
                 ViewBag.Account = user.Account;
@@ -592,7 +586,7 @@ namespace WingStudio.Controllers
         public ActionResult ColumnNewBlogs()
         {
             ViewBag.Title = "最新博客 - 博客专栏";
-            var blogs = entity.Blogs.Where(m => m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.PublicTime).ToPagedList(1, 10);
+            var blogs = Entity.Blogs.Where(m => m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.PublicTime).ToPagedList(1, 10);
             return View("Blogs", blogs);
         }
 
@@ -603,7 +597,7 @@ namespace WingStudio.Controllers
         public ActionResult ColumnHotBlogs()
         {
             ViewBag.Title = "最热博客 - 博客专栏";
-            var blogs = entity.Blogs.Where(m => m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.LookCount).ThenBy(m => m.Id).ToPagedList(1, 10);
+            var blogs = Entity.Blogs.Where(m => m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.LookCount).ThenBy(m => m.Id).ToPagedList(1, 10);
             return View("Blogs", blogs);
         }
 
@@ -614,7 +608,7 @@ namespace WingStudio.Controllers
         public ActionResult ColumnPraiseBlogs()
         {
             ViewBag.Title = "强推博客 - 博客专栏";
-            var blogs = entity.Blogs.Where(m => m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.Recommendations.Count).ThenBy(m => m.LookCount).ToPagedList(1, 10);
+            var blogs = Entity.Blogs.Where(m => m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0).OrderByDescending(m => m.Recommendations.Count).ThenBy(m => m.LookCount).ToPagedList(1, 10);
             return View("Blogs", blogs);
         }
 
@@ -625,25 +619,25 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowBlog(int id)
         {
-            var blog = entity.Blogs.Find(id);
+            var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.IsPublic)
             {
                 if(blog.Owner.UserConfig.PublicBlog)
                 {
                     blog.LookCount++;
-                    entity.SaveChanges();
-                    var blogs = entity.Blogs.Where(m => m.Owner.Id == blog.Owner.Id && m.IsPublic);
-                    ViewBag.LastBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
-                    ViewBag.NextBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                    Entity.SaveChanges();
+                    var blogs = Entity.Blogs.Where(m => m.Owner.Id == blog.Owner.Id && m.IsPublic);
+                    ViewBag.LastBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                    ViewBag.NextBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
                     return View("ShowBlog", blog);
                 }
                 else if(blog.Checked && blog.Groups.Count(m => (m.Accessible & Accessible.Outer) != 0) > 0)
                 {
                     blog.LookCount++;
-                    entity.SaveChanges();
-                    var blogs = entity.Blogs.Where(m => m.Owner.Id == blog.Owner.Id && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0);
-                    ViewBag.LastBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
-                    ViewBag.NextBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                    Entity.SaveChanges();
+                    var blogs = Entity.Blogs.Where(m => m.Owner.Id == blog.Owner.Id && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0);
+                    ViewBag.LastBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                    ViewBag.NextBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault(); 
                     return View("ShowBlog", blog);
                 }
                 else
@@ -664,11 +658,11 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowToListBlog(int id)
         {
-            var blog = entity.ToListBlogs.Find(id);
+            var blog = Entity.ToListBlogs.Find(id);
             if (blog != null)
             {
                 blog.LookCount++;
-                entity.SaveChanges();
+                Entity.SaveChanges();
                 return View("ShowToListBlog", blog);
             }
             else
@@ -693,7 +687,7 @@ namespace WingStudio.Controllers
             else
             {
                 searchContent = searchContent.Trim();
-                var blogs = entity.Blogs.Where(m => m.IsPublic).Where(m => m.Owner.UserConfig.PublicBlog || m.Groups.Count(g => (g.Accessible & Accessible.Outer) != 0) > 0).Where(m => m.Theme.Contains(searchContent)).OrderByDescending(m => m.Id);
+                var blogs = Entity.Blogs.Where(m => m.IsPublic).Where(m => m.Owner.UserConfig.PublicBlog || m.Groups.Count(g => (g.Accessible & Accessible.Outer) != 0) > 0).Where(m => m.Theme.Contains(searchContent)).OrderByDescending(m => m.Id);
                 var pageNumber = page ?? 1;
                 
                 var onePageOfProducts = blogs.ToPagedList(pageNumber, 10);
@@ -705,12 +699,13 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 按标签搜索博客
         /// </summary>
+        /// <param name="id">博客Id</param>
         /// <param name="searchContent"></param>
         /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult SearchTagBlog(int id, string searchContent, int? page)
         {
-            var user = entity.Users.Find(id);
+            var user = Entity.Users.Find(id);
             if(user != null)
             {
                 ViewBag.Title = "标签搜索 - 个人博客";
@@ -754,7 +749,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ResourceColumn()
         {
-            var groups = entity.FileGroups.Where(m => (m.Accessible & Accessible.Outer) != 0);
+            var groups = Entity.FileGroups.Where(m => (m.Accessible & Accessible.Outer) != 0);
             return View(groups);
         }
 
@@ -765,7 +760,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ColumnResources(int id)
         {
-            var fileGroup = entity.FileGroups.Find(id);
+            var fileGroup = Entity.FileGroups.Find(id);
             if (fileGroup != null && (fileGroup.Accessible & Accessible.Outer) != 0)
             {
                 return View("Resources", fileGroup);
@@ -783,7 +778,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult LookDocument(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Type == FileType.Document && file.Groups.Count(m => (m.Accessible & Accessible.Outer) != 0) > 0)
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
@@ -791,7 +786,7 @@ namespace WingStudio.Controllers
                 {
 
                     file.LookCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
 
                     //.doc(x)、.txt、.xls(x)、.ppt(x)、.pdf
 
@@ -800,8 +795,8 @@ namespace WingStudio.Controllers
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -818,21 +813,21 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult LoadResource(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Groups.Count(m => (m.Accessible & Accessible.Outer) != 0) > 0)
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
                 if (System.IO.File.Exists(path))
                 {
                     file.LoadCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     return File(path, "application/octet-stream", Url.Encode(file.Name));
                 }
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -849,14 +844,14 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult PlayVideo(int id)
         {
-            var file = entity.WebFiles.Find(id);
+            var file = Entity.WebFiles.Find(id);
             if (file != null && file.Type == FileType.Video && file.Groups.Count(m => (m.Accessible & Accessible.Outer) != 0) > 0)
             {
                 var path = Server.MapPath("~/WingStudio/Resource/") + file.FilePath;
                 if (System.IO.File.Exists(path))
                 {
                     file.LookCount++;
-                    entity.SaveChanges();
+                    Entity.SaveChanges();
                     ViewBag.FileName = file.Name;
                     ViewBag.TargetSource = file.FilePath;
                     return View("PlayVideo");
@@ -864,8 +859,8 @@ namespace WingStudio.Controllers
                 else
                 {
                     //file.Groups.Clear();
-                    entity.WebFiles.Remove(file);
-                    entity.SaveChanges();
+                    Entity.WebFiles.Remove(file);
+                    Entity.SaveChanges();
                     return Content(WebHelper.SweetAlert("操作提示", "对不起，该资源已丢失!给你带来困扰，非常抱歉!"));
                 }
             }
@@ -890,7 +885,7 @@ namespace WingStudio.Controllers
             else
             {
                 searchContent = searchContent.Trim();
-                var files = entity.WebFiles.Where(m => m.Groups.Count(g => (g.Accessible & Accessible.Outer) != 0) > 0).Where(m => m.Name.Contains(searchContent)).OrderByDescending(m => m.Id);
+                var files = Entity.WebFiles.Where(m => m.Groups.Count(g => (g.Accessible & Accessible.Outer) != 0) > 0).Where(m => m.Name.Contains(searchContent)).OrderByDescending(m => m.Id);
                 var pageNumber = page ?? 1;
                 ViewBag.PageNumber = pageNumber;
                 var onePageOfProducts = files.ToPagedList(pageNumber, 10);
@@ -909,7 +904,7 @@ namespace WingStudio.Controllers
         /// <returns></returns>
         public ActionResult ShowApplication(int id)
         {
-            var app = entity.Applications.Find(id);
+            var app = Entity.Applications.Find(id);
             if (app != null && ((app.StartTime < DateTime.Now) || (Request.IsAuthenticated && User.IsInRole("Admin"))))
             {
                 if(app.StartTime > DateTime.Now)
@@ -941,7 +936,7 @@ namespace WingStudio.Controllers
         [HttpPost]
         public JsonResult RepeatedApply(int id, string sno)
         {
-            var app = entity.Applications.Find(id);
+            var app = Entity.Applications.Find(id);
             if(app != null)
             {
                 if(app.Participants.Count(m => m.StudentNo == sno) > 0)
@@ -974,25 +969,27 @@ namespace WingStudio.Controllers
             {
                 return Json(new { title = "申请失败", message = "验证码错误!" });
             }
-            var app = entity.Applications.Find(id);
+            var app = Entity.Applications.Find(id);
             if (app != null && DateTime.Compare(app.StartTime, DateTime.Now) <= 0)
             {
                 if (DateTime.Compare(app.EndTime, DateTime.Now) >= 0)
                 {
                     if(WebSecurity.IsValidParticipant(part, app.IsFormal))
                     {
-                        var newPart = new Participant();
-                        newPart.Name = part.Name.Trim();
-                        newPart.StudentNo = part.StudentNo;
-                        newPart.StudentClass = part.StudentClass.Trim();
-                        newPart.Email = part.Email;
+                        var newPart = new Participant
+                        {
+                            Name = part.Name.Trim(),
+                            StudentNo = part.StudentNo,
+                            StudentClass = part.StudentClass.Trim(),
+                            Email = part.Email
+                        };
                         if(app.IsFormal)
                         {
                             newPart.Phone = part.Phone;
                             newPart.Sex = (part.Sex == "M") ? "M" : "W";
                         }
                         app.Participants.Add(newPart);
-                        entity.SaveChanges();
+                        Entity.SaveChanges();
                         return Json(new { title = "申请成功", message = "成功报名!", count = app.Participants.Count });
                     }
                     else

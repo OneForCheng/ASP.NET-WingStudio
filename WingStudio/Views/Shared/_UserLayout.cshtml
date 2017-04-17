@@ -1,7 +1,6 @@
-﻿@using WingStudio.Models
-@{ 
+﻿@{ 
     var entity = new WebAppContext();
-    int id = Convert.ToInt32(User.Identity.Name);
+    var id = Convert.ToInt32(User.Identity.Name);
     var logined = entity.Users.Find(id);
 }
 <!DOCTYPE html>
@@ -49,7 +48,7 @@
                     <li>@Html.ActionLink("博客专栏", "BlogColumn", "User")</li>
                     <li>@Html.ActionLink("资源专栏", "ResourceColumn", "User")</li>
                     @{
-                        int msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
+                        var msgCount = entity.Messages.Count(m => m.Packets.Count(n => !n.Deleted && !n.Read && n.TargetId == id) > 0);
                         if (msgCount > 0)
                         {
                             <li>@Html.ActionLink("消息", "ReadingMsg", "User")<span class="tip-bubble-x" title="新消息">@msgCount</span></li>

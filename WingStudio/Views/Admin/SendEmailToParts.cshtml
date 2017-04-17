@@ -1,5 +1,4 @@
-﻿@using WingStudio.Models;
-@model EmailInfo
+﻿@model EmailInfo
 @{
     ViewBag.Title = "发送邮件通知";
     Application app = ViewBag.App;
@@ -65,7 +64,7 @@
                     </thead>
                     <tbody id="user-data">
                         @{
-                            int i = 0;
+                            var i = 0;
                             foreach (var item in app.Participants)
                             {
                                 i++;

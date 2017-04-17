@@ -1,9 +1,8 @@
 ﻿@using PagedList.Mvc;
-@using PagedList;
 @model IPagedList<WingStudio.Models.BlogGroup>
 @{
     ViewBag.Title = "博客专栏";
-    string controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
 }
 
 <div class="body-content">

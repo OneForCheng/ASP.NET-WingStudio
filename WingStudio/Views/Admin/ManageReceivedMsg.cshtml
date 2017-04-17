@@ -1,6 +1,4 @@
-﻿@using WingStudio.Models;
-@using PagedList.Mvc;
-@using PagedList;
+﻿@using PagedList.Mvc;
 @model IPagedList<WingStudio.Models.Message>
 
 @{
@@ -47,7 +45,7 @@
                     {
                         var entity = new WebAppContext();
                         int page = ViewBag.PageNumber;
-                        int i = (page - 1) * 10;
+                        var i = (page - 1) * 10;
                         foreach (var item in Model)
                         {
                             i++;

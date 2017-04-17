@@ -1,6 +1,4 @@
-﻿@using WingStudio.Models;
-@using PagedList.Mvc;
-@using PagedList;
+﻿@using PagedList.Mvc;
 @model IPagedList<WingStudio.Models.UserGroup>
 
 @{
@@ -31,7 +29,7 @@
                         @{
                             int page = ViewBag.PageNumber;
                             int i = (page - 1) * 10, j;
-                            Dictionary<int, string> dic = new Dictionary<int, string> {
+                            var dic = new Dictionary<int, string> {
                                 {(int)AuthorityFlag.ManageNotice,"公告"},
                                 {(int)AuthorityFlag.ManageDynamic,"动态"},
                                 {(int)AuthorityFlag.ManageFile,"文件"},

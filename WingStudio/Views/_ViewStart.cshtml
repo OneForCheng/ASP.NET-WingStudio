@@ -1,13 +1,6 @@
 ﻿@if (ViewContext.RouteData.Values["controller"].ToString().ToLower() != "home" && Request.IsAuthenticated)
 {
-    if (User.IsInRole("User"))
-    {
-        Layout = "~/Views/Shared/_UserLayout.cshtml";
-    }
-    else
-    {
-        Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    }
+    Layout = User.IsInRole("User") ? "~/Views/Shared/_UserLayout.cshtml" : "~/Views/Shared/_AdminLayout.cshtml";
 }
 else
 {

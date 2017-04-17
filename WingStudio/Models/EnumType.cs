@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace WingStudio.Models
 {
@@ -126,6 +123,7 @@ namespace WingStudio.Models
     /// <summary>
     /// 资源可访问性
     /// </summary>
+    [Flags]
     public enum Accessible
     {
         /// <summary>

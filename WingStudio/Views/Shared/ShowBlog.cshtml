@@ -1,11 +1,10 @@
-﻿@using WingStudio.Models;
-@model WingStudio.Models.Blog
+﻿@model WingStudio.Models.Blog
 
 @{
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
     Blog lastBlog = ViewBag.LastBlog;
     Blog nextBlog = ViewBag.NextBlog;
-    string typeText = "";
+    var typeText = "";
     if (Model.Type == BlogType.Jotting)
     {
         typeText = "随笔: ";
@@ -15,7 +14,7 @@
         typeText = "文章: ";
     }
     ViewBag.Title = typeText + Model.Theme + " - " + Model.Owner.Account;
-    string controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
 
 }
 
@@ -41,7 +40,7 @@
                 {
                     <div class="tag">
                         标签:
-                        @for (int i = 0; i < count - 1; i++)
+                        @for (var i = 0; i < count - 1; i++)
                         {
                             <a href="@Url.Action("SearchTagBlog","Home", new { id = Model.Owner.Id, searchContent = subStrs[i] })">@subStrs[i]</a>
                             <span>,</span>
@@ -146,7 +145,7 @@
         <script src="~/Content/User/ShowBlog/ShowBlog_baidu.js"></script>
     }
     else
-    {
+    {   
         <script src="~/Scripts/editor.md/lib/marked.min.js"></script>
         <script src="~/Scripts/editor.md/lib/prettify.min.js"></script>
         <script src="~/Scripts/editor.md/lib/raphael.min.js"></script>
