@@ -101,10 +101,10 @@ namespace WingStudio.Models
         /// </summary>
         public DbSet<Blog> Blogs { get; set; }
 
-        /// <summary>
-        /// 博客榜
-        /// </summary>
-        public DbSet<tolistblog> ToListBlogs { get; set; }
+        ///// <summary>
+        ///// 博客榜
+        ///// </summary>
+        //public DbSet<tolistblog> ToListBlogs { get; set; }
 
         /// <summary>
         /// 重置码

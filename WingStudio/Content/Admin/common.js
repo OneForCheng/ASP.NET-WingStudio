@@ -65,25 +65,24 @@ function CheckedAllBox(id, name) {
 
 //更新图标
 var cropperHeader;
-var currentId = 0;
 
-function UpdateIcon(id, type, index) {
-    if (currentId == id) {
-        return true;
+function UpdateIcon(id, type) {
+
+    //var targetId = (type + "_" + index);
+    if (cropperHeader != null) {
+        cropperHeader.destroy();
     }
-    else {
-        currentId = id;
-    }
-    var targetId = (type + "_" + index)
     cropperHeader = new Croppic('icon_box', {
         modal: true,
         uploadUrl: '/Admin/UploadIcon',
         cropUrl: '/Admin/CropIcon',
         cropData: { id: id, type: type },
-        customUploadButtonId: targetId,
+        //customUploadButtonId: targetId,
         rotateControls: false,
         onAfterImgCrop: function () {
             location.reload();//刷新
-        },
+        }
     });
+   
+    $(".cropControlUpload").click();
 }

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using System.Web.Security;
 using WingStudio.Models;
 
@@ -452,8 +453,8 @@ namespace WingStudio.Controllers
                 notice.LookCount++;
                 Entity.SaveChanges();
                 var notices = Entity.Notices.Where(m => m.IsPublic);
-                ViewBag.LastNotice = notices.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
-                ViewBag.NextNotice = notices.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.LastNotice = notices.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.NextNotice = notices.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault(); 
                 return View(notice);
             }
             return View("Error");
@@ -493,8 +494,8 @@ namespace WingStudio.Controllers
                 dynamic.LookCount++;
                 Entity.SaveChanges();
                 var dynamics = Entity.Dynamics.Where(m => m.IsPublic);
-                ViewBag.LastDynamic = dynamics.Where(m => m.IsFormal == dynamic.IsFormal && m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
-                ViewBag.NextDynamic = dynamics.Where(m => m.IsFormal == dynamic.IsFormal && m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.LastDynamic = dynamics.Where(m => m.IsFormal == dynamic.IsFormal && m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
+                ViewBag.NextDynamic = dynamics.Where(m => m.IsFormal == dynamic.IsFormal && m.Id > id).OrderBy(m => m.Id).FirstOrDefault();
                 return View(dynamic);
             }
             else
@@ -651,25 +652,25 @@ namespace WingStudio.Controllers
             }
         }
 
-        /// <summary>
-        /// 显示入榜博客
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public ActionResult ShowToListBlog(int id)
-        {
-            var blog = Entity.ToListBlogs.Find(id);
-            if (blog != null)
-            {
-                blog.LookCount++;
-                Entity.SaveChanges();
-                return View("ShowToListBlog", blog);
-            }
-            else
-            {
-                return View("Error");
-            }
-        }
+        ///// <summary>
+        ///// 显示入榜博客
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //public ActionResult ShowToListBlog(int id)
+        //{
+        //    var blog = Entity.ToListBlogs.Find(id);
+        //    if (blog != null)
+        //    {
+        //        blog.LookCount++;
+        //        Entity.SaveChanges();
+        //        return View("ShowToListBlog", blog);
+        //    }
+        //    else
+        //    {
+        //        return View("Error");
+        //    }
+        //}
 
         /// <summary>
         /// 搜索博客
@@ -731,7 +732,6 @@ namespace WingStudio.Controllers
                         var onePageOfProducts = blogs.ToPagedList(pageNumber, 10);
                         return View("Blogs", onePageOfProducts);
                     }
-                    
                 }
             }
             else
@@ -894,6 +894,89 @@ namespace WingStudio.Controllers
             }
         }
 
+        #endregion
+
+        #region 博客日历
+
+        /// <summary>
+        /// 获取该月存在博客的情况
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetMonthBlogsCase(int year, int month)
+        {
+            if (!(year > 2000 && year <= DateTime.Now.Year && month > 0 && month <= 12))
+            {
+                return Json(new { });
+            }
+            try
+            {
+                var days = DateTime.DaysInMonth(year, month);
+                var list = new List<DayBlog>();
+                var blogs = Entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month);
+                var controller = RouteData.Values["controller"].ToString();
+                if (!controller.Equals("user", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    blogs = blogs.Where(m => m.Owner.UserConfig.PublicBlog || (m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0));
+                }
+                for (var i = 1; i <= days; i++)
+                {
+                    list.Add(new DayBlog { Count = blogs.Count(m => ((DateTime)m.PublicTime).Day == i) });
+                }
+
+                return Json((new JavaScriptSerializer()).Serialize(list));
+            }
+            catch
+            {
+                return Json(new { });
+            }
+
+        }
+
+        /// <summary>
+        /// 获取每日博客
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public ActionResult OneDayBlogs(int year, int month, int day, int? page)
+        {
+            if (!(year > 2000 && year <= DateTime.Now.Year && month > 0 && month <= 12 && day > 0 && day <= 31))
+            {
+                return View("Error");
+            }
+            try
+            {
+                var blogs = Entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month && ((DateTime)m.PublicTime).Day == day);
+
+                var controller = RouteData.Values["controller"].ToString();
+                if (!controller.Equals("user", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    blogs = blogs.Where(m => m.Owner.UserConfig.PublicBlog || (m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0));
+                }
+                else
+                {
+                    ViewBag.Logined = Entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                }
+
+                ViewBag.Title = $"{year}年{month}月{day}日 - 博客档案";
+                ViewBag.Year = year;
+                ViewBag.Month = month;
+                ViewBag.Day = day;
+                var pageNumber = page ?? 1;
+                var onePageOfProducts = blogs.OrderByDescending(m => m.Id).ToPagedList(pageNumber, 10);
+                return View("Blogs", onePageOfProducts);
+            }
+            catch
+            {
+                return View("Error");
+            }
+        }
+        
         #endregion
 
         #region 报名页面

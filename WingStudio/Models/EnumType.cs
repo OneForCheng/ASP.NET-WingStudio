@@ -5,6 +5,7 @@ namespace WingStudio.Models
     /// <summary>
     /// 权限标识
     /// </summary>
+    [Flags]
     public enum AuthorityFlag
     {
         /// <summary>

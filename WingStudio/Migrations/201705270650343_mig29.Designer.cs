@@ -7,13 +7,13 @@ namespace WingStudio.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class mig28 : IMigrationMetadata
+    public sealed partial class mig29 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(mig28));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(mig29));
         
         string IMigrationMetadata.Id
         {
-            get { return "201610091138263_mig28"; }
+            get { return "201705270650343_mig29"; }
         }
         
         string IMigrationMetadata.Source

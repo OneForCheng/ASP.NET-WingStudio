@@ -45,6 +45,89 @@ namespace WingStudio.Controllers
 
         #endregion
 
+        #region 博客日历
+
+        /// <summary>
+        /// 获取该月存在博客的情况
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetMonthBlogsCase(int year, int month)
+        {
+            if (!(year > 2000 && year <= DateTime.Now.Year && month > 0 && month <= 12))
+            {
+                return Json(new { });
+            }
+            try
+            {
+                var days = DateTime.DaysInMonth(year, month);
+                var list = new List<DayBlog>();
+                var blogs = Entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month);
+                var controller = RouteData.Values["controller"].ToString();
+                if (!controller.Equals("user", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    blogs = blogs.Where(m => m.Owner.UserConfig.PublicBlog || (m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0));
+                }
+                for (var i = 1; i <= days; i++)
+                {
+                    list.Add(new DayBlog { Count = blogs.Count(m => ((DateTime)m.PublicTime).Day == i) });
+                }
+
+                return Json((new JavaScriptSerializer()).Serialize(list));
+            }
+            catch
+            {
+                return Json(new { });
+            }
+
+        }
+
+        /// <summary>
+        /// 获取每日博客
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public ActionResult OneDayBlogs(int year, int month, int day, int? page)
+        {
+            if (!(year > 2000 && year <= DateTime.Now.Year && month > 0 && month <= 12 && day > 0 && day <= 31))
+            {
+                return View("Error");
+            }
+            try
+            {
+                var blogs = Entity.Blogs.Where(m => m.IsPublic && ((DateTime)m.PublicTime).Year == year && ((DateTime)m.PublicTime).Month == month && ((DateTime)m.PublicTime).Day == day);
+
+                var controller = RouteData.Values["controller"].ToString();
+                if (!controller.Equals("user", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    blogs = blogs.Where(m => m.Owner.UserConfig.PublicBlog || (m.Checked && m.Groups.Count(n => (n.Accessible & Accessible.Outer) != 0) > 0));
+                }
+                else
+                {
+                    ViewBag.Logined = Entity.Users.Find(Convert.ToInt32(User.Identity.Name));
+                }
+
+                ViewBag.Title = $"{year}年{month}月{day}日 - 博客档案";
+                ViewBag.Year = year;
+                ViewBag.Month = month;
+                ViewBag.Day = day;
+                var pageNumber = page ?? 1;
+                var onePageOfProducts = blogs.OrderByDescending(m => m.Id).ToPagedList(pageNumber, 10);
+                return View("Blogs", onePageOfProducts);
+            }
+            catch
+            {
+                return View("Error");
+            }
+        }
+
+        #endregion
+
         #region 个人信息
 
         /// <summary>
@@ -231,6 +314,7 @@ namespace WingStudio.Controllers
             {
                 return Json(new {status = "error", message = "上传图片不能为空!" });
             }
+            
             var picture = Request.Files[0];
             if (picture.ContentLength > 5242880)
             {
@@ -258,9 +342,7 @@ namespace WingStudio.Controllers
                 double width = image.Width;
                 return Json(new {
                     status = "success",
-                    url = $"/WingStudio/Avatar/{fileName}",
-                    width = width,
-                    height = height
+                    url = $"/WingStudio/Avatar/{fileName}", width, height
                 });
             }
             else
@@ -518,7 +600,7 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 更新联系方式
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="contact"></param>
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -660,9 +742,8 @@ namespace WingStudio.Controllers
             }
             else if (blog.Owner.Id == logined.Id)
             {
-                //blog.LookCount++;
-                //entity.SaveChanges();
-                var blogs = logined.Blogs.Where(m => m.Type == blog.Type);
+
+                var blogs = logined.Blogs.Where(m => m.Type == blog.Type).ToList();
                 ViewBag.LastBlog = blogs.Where(m => m.Id < id).OrderByDescending(m => m.Id).FirstOrDefault();
                 ViewBag.NextBlog = blogs.Where(m => m.Id > id).OrderBy(m => m.Id).FirstOrDefault(); 
                 ViewBag.Logined = logined;
@@ -755,6 +836,7 @@ namespace WingStudio.Controllers
         /// 专栏博客
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult ColumnBlogs(int id, int? page)
         {
@@ -836,12 +918,12 @@ namespace WingStudio.Controllers
             }
             ViewBag.BlogType = blogType;
 
-            var id = Convert.ToInt32(User.Identity.Name);
-            var logined = Entity.Users.Find(id);
-            ViewBag.PublicBlog = logined.UserConfig.PublicBlog;
-            ViewBag.Account = logined.Account;
+  
 
-            var blogs = Entity.Blogs.Where(m => m.Owner.Id == id && m.Type == blogType).OrderByDescending(m => m.Id);
+            ViewBag.PublicBlog = Loginer.UserConfig.PublicBlog;
+            ViewBag.Account = Loginer.Account;
+
+            var blogs = Entity.Blogs.Where(m => m.Owner.Id == Loginer.Id && m.Type == blogType).OrderByDescending(m => m.Id);
             var pageNumber = page ?? 1;
             var onePageOfProducts = blogs.ToPagedList(pageNumber, 10);
             return View("ManageBlog", onePageOfProducts);
@@ -916,7 +998,8 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 登录用户博客
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
         public ActionResult LoginUserBlogs(int? page, string type)
         {
@@ -1253,26 +1336,26 @@ namespace WingStudio.Controllers
                 if (!string.IsNullOrWhiteSpace(blog.Tag))
                 {
                     var str = "";
-                    var subStrs = blog.Tag.ToLower().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct();
-                    var count = subStrs.Count() < 10 ? subStrs.Count() : 10;
+                    var subStrs = blog.Tag.ToLower().Split(new [] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray();
+                    var count = subStrs.Length < 10 ? subStrs.Length : 10;
                     for (var i = 0; i < count - 1; i++)
                     {
-                        if (subStrs.ElementAt(i).Length < 51)
+                        if (subStrs[i].Length < 51)
                         {
-                            str += subStrs.ElementAt(i) + ",";
+                            str += subStrs[i] + ",";
                         }
                         else
                         {
-                            str += subStrs.ElementAt(i).Substring(0, 50) + ",";
+                            str += subStrs[i].Substring(0, 50) + ",";
                         }
                     }
-                    if (subStrs.ElementAt(count - 1).Length < 51)
+                    if (subStrs[count - 1].Length < 51)
                     {
-                        str += subStrs.ElementAt(count - 1);
+                        str += subStrs[count - 1];
                     }
                     else
                     {
-                        str += subStrs.ElementAt(count - 1).Substring(0, 50);
+                        str += subStrs[count - 1].Substring(0, 50);
                     }
                     targetBlog.Tag = str;
                 }
@@ -1364,7 +1447,7 @@ namespace WingStudio.Controllers
             var blog = Entity.Blogs.Find(id);
             if (blog != null && blog.Owner.Id == Convert.ToInt32(User.Identity.Name))
             {
-                var typeText = "";
+                string typeText;
                 if (blog.Type == BlogType.Jotting)
                 {
                     typeText = "随笔";
@@ -1575,6 +1658,7 @@ namespace WingStudio.Controllers
         /// 显示资源
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult ColumnResources(int id, int? page)
         {
@@ -2348,6 +2432,7 @@ namespace WingStudio.Controllers
         /// 标识为已读
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult HadRead(int id, int? page)
         {
@@ -2424,7 +2509,6 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 发送信息
         /// </summary>
-        /// <param name="type"></param>
         /// <param name="msg"></param>
         /// <returns></returns>
         [HttpPost]

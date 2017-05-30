@@ -36,7 +36,7 @@
                                 <tr>
                                     <td>@i</td>
                                     <td>
-                                        <img src="~/Content/Images/Shared/Icon/@item.Icon" class="group-icon pointer" title="修改图标" onmouseover="UpdateIcon(@item.Id, 'blogGroup',@i);" id="blogGroup_@i"/>
+                                        <img src="~/Content/Images/Shared/Icon/@item.Icon" class="group-icon pointer" title="修改图标" onclick="UpdateIcon(@item.Id, 'blogGroup');" />
                                         <span title="@item.Theme">@item.Theme</span>
                                     </td>
                                     <td title="@item.Description">@item.Description</td>

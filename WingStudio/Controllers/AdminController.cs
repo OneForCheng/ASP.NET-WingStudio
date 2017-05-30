@@ -119,9 +119,7 @@ namespace WingStudio.Controllers
                 return Json(new
                 {
                     status = "success",
-                    url = $"/Content/Images/Shared/Icon/{fileName}",
-                    width = width,
-                    height = height
+                    url = $"/Content/Images/Shared/Icon/{fileName}", width, height
                 });
             }
             else
@@ -765,6 +763,7 @@ namespace WingStudio.Controllers
         /// 显示博客组中博客
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult ShowGroupBlogs(int id, int? page)
         {
@@ -1237,6 +1236,7 @@ namespace WingStudio.Controllers
         /// 显示文件组中文件
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult ShowGroupFiles(int id, int? page)
         {
@@ -1288,7 +1288,7 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 待检测文件
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult CheckingFile(int? page)
         {
@@ -1842,7 +1842,8 @@ namespace WingStudio.Controllers
         /// 从指定报名组中删除指定报名者
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="appId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult DelParticipant(int id, int groupId, int? page)
         {
@@ -1894,6 +1895,7 @@ namespace WingStudio.Controllers
         /// <summary>
         /// 搜索报名人员
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="searchContent"></param>
         /// <param name="page"></param>
         /// <returns></returns>
@@ -2113,7 +2115,8 @@ namespace WingStudio.Controllers
                             state.Read = true;
                             Entity.SaveChanges();
                         }
-                        ViewBag.Owner = Entity.Users.Find(msg.OwnId).Account;
+                        var ower = Entity.Users.Find(msg.OwnId);
+                        if (ower != null) ViewBag.Owner = ower.Account;
                         return View(msg);
                     }
                     else
@@ -2132,6 +2135,7 @@ namespace WingStudio.Controllers
         /// 标识为已读
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult HadRead(int id, int? page)
         {
@@ -2224,7 +2228,7 @@ namespace WingStudio.Controllers
                 }
                 else
                 {
-                    var subStrs = target.ToLower().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).Distinct();
+                    var subStrs = target.ToLower().Split(new [] { ";" }, StringSplitOptions.RemoveEmptyEntries).Distinct();
 
                     var userIds = from user in Entity.Users where subStrs.Contains(user.Account) select user.Id;
                     if (userIds.Any())
@@ -2328,6 +2332,7 @@ namespace WingStudio.Controllers
         /// 搜索信息
         /// </summary>
         /// <param name="searchContent"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult SearchReceivedMsg(string searchContent, int? page)
         {
@@ -2363,6 +2368,7 @@ namespace WingStudio.Controllers
         /// 搜索信息
         /// </summary>
         /// <param name="searchContent"></param>
+        /// <param name="page"></param>
         /// <returns></returns>
         public ActionResult SearchSentMsg(string searchContent, int? page)
         {

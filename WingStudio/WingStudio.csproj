@@ -1175,13 +1175,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201610090635347_mig27.cs" />
-    <Compile Include="Migrations\201610090635347_mig27.Designer.cs">
-      <DependentUpon>201610090635347_mig27.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201610091138263_mig28.cs" />
-    <Compile Include="Migrations\201610091138263_mig28.Designer.cs">
-      <DependentUpon>201610091138263_mig28.cs</DependentUpon>
+    <Compile Include="Migrations\201705270650343_mig29.cs" />
+    <Compile Include="Migrations\201705270650343_mig29.Designer.cs">
+      <DependentUpon>201705270650343_mig29.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Blog.cs" />
@@ -1492,11 +1488,8 @@
     <Folder Include="WingStudio\Temp\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201610090635347_mig27.resx">
-      <DependentUpon>201610090635347_mig27.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201610091138263_mig28.resx">
-      <DependentUpon>201610091138263_mig28.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201705270650343_mig29.resx">
+      <DependentUpon>201705270650343_mig29.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

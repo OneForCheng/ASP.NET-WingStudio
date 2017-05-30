@@ -254,7 +254,7 @@ section.content .widget header .search-form {
 section.content .widget header .search-form .search-header {
     float: left;
     width:35px;
-    height:34px;
+    height:37px;
     font-size: 17px;
     background-color:#fff;
     color: #000;
@@ -266,6 +266,7 @@ section.content .widget header .search-form .search-header {
 section.content .widget header .search-form .search-input {
     float: right;
     width: 165px;
+    height:37px;
     padding: 8px 10px;
     font-size: 14px;
     font-family: initial;
